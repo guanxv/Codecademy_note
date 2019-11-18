@@ -1,0 +1,254 @@
+#------------------------------------------------------------------------------
+
+import codecademylib
+
+import numpy as np
+
+calorie_stats = np.genfromtxt('cereal.csv',delimiter = ",")
+
+average_calories = np.mean(calorie_stats)
+
+print(average_calories)
+
+calorie_stats_sorted = sorted(calorie_stats)
+
+print (calorie_stats)
+
+print (calorie_stats_sorted)
+
+median_calories = np.median(calorie_stats)
+
+print("\n")
+print (median_calories)
+
+nth_percentile = np.percentile(calorie_stats, 3.8961)
+
+print("\n")
+print nth_percentile
+
+more_calories = np.mean (calorie_stats > 60)
+
+print (more_calories)
+
+more_calories = np.std(calorie_stats)
+print (more_calories)
+
+#------------------------------------------------------------------------------
+
+
+import codecademylib
+import numpy as np
+from matplotlib import pyplot as plt
+
+# Brachiosaurus
+b_data = np.random.normal(6.7,0.7,size = 1000)
+
+# Fictionosaurus
+f_data = np.random.normal(7.7,0.3,size = 1000)
+
+plt.hist(b_data,
+         bins=30, range=(5, 8.5), histtype='step',
+         label='Brachiosaurus')
+plt.hist(f_data,
+         bins=30, range=(5, 8.5), histtype='step',
+         label='Fictionosaurus')
+plt.xlabel('Femur Length (ft)')
+plt.legend(loc=2)
+plt.show()
+
+#--------------------------------------------
+STATISTICAL DISTRIBUTIONS WITH NUMPY
+Review
+Let’s review! In this lesson, you learned how to use NumPy to analyze different distributions and generate random numbers to produce datasets. Here’s what we covered:
+
+What is a histogram and how to map one using Matplotlib
+How to identify different dataset shapes, depending on peaks or distribution of data
+The definition of a normal distribution and how to use NumPy to generate one using NumPy’s random number functions
+The relationships between normal distributions and standard deviations
+The definition of a binomial distribution
+Now you can use NumPy to analyze and graph your own datasets! You should practice building your intuition about not only what the data says, but what conclusions can be drawn from your observations.
+
+Instructions
+1.
+Practice what you’ve just learned with a dataset on sunflower heights! Imagine that you work for a botanical garden and you want to see how the sunflowers you planted last year did to see if you want to plant more of them.
+
+Calculate the mean and standard deviation of this dataset. Save the mean to sunflowers_mean and the standard deviation to sunflowers_std.
+
+2.
+We can see from the histogram that our data isn’t normally distributed. Let’s create a normally distributed sample to compare against what we observed.
+
+Generate 5,000 random samples with the same mean and standard deviation as sunflowers. Save these to sunflowers_normal.
+
+3.
+Now that you generated sunflowers_normal, uncomment (remove all of the #) the second plt.hist statement. Press run to see your normal distribution and your observed distribution.
+
+4.
+Generally, 10% of sunflowers that are planted fail to bloom. We planted 200, and want to know the probability that fewer than 20 will fail to bloom.
+
+First, generate 5,000 binomial random numbers that represent our situation. Save them to experiments.
+
+5.
+What percent of experiments had fewer than 20 sunflowers fail to bloom?
+
+Save your answer to the variable prob. This is the approximate probability that fewer than 20 of our sunflowers will fail to bloom.
+
+6.
+Print prob. Is it likely that fewer than 20 of our sunflowers will fail to bloom?
+#--------------------------------------------
+
+import codecademylib
+import numpy as np
+from matplotlib import pyplot as plt
+
+sunflowers = np.genfromtxt('sunflower_heights.csv',
+                           delimiter=',')
+
+# Calculate mean and std of sunflowers here:
+sunflowers_mean = np.mean(sunflowers)
+sunflowers_std = np.std(sunflowers)
+
+print (sunflowers_mean)
+print (sunflowers_std)
+
+# Calculate sunflowers_normal here:
+sunflowers_normal = np.random.normal(sunflowers_mean,sunflowers_std,5000)
+
+plt.hist(sunflowers,
+         range=(11, 15), histtype='step', linewidth=2,
+        label='observed', normed=True)
+plt.hist(sunflowers_normal,
+         range=(11, 15), histtype='step', linewidth=2,
+        label='normal', normed=True)
+plt.legend()
+plt.show()
+
+# Calculate probabilities here:
+experiments = np.random.binomial(200,0.1,5000)
+
+prob = np.mean(experiments<20)
+
+print("\n")
+print (prob)
+
+#-----------------------------------------------------------------
+NUMPY: A PYTHON LIBRARY FOR STATISTICS
+Election Results
+You’re part of an impartial research group that conducts phone surveys prior to local elections. During this election season, the group conducted a survey to determine how many people would vote for Cynthia Ceballos vs. Justin Kerrigan in the mayoral election.
+
+Now that the election has occurred, your group wants to compare the survey responses to the actual results.
+
+Was your survey a good indicator? Let’s find out!
+
+If you get stuck during this project or would like to see an experienced developer work through it, click “Get Help“ to see a project walkthrough video.
+
+Tasks
+7/9Complete
+Mark the tasks as complete by checking them off
+PROJECT STEPS
+1.
+First, import numpy and matplotlib.
+
+2.
+At the top of script.py is a list of the different survey responses.
+
+Calculate the number of people who answered ‘Ceballos’ and save the answer to the variable total_ceballos.
+
+Print the variable to the terminal to see its value.
+
+total = sum([1 for n in list if n == foo])
+3.
+Calculate the percentage of people in the survey who voted for Ceballos and save it to the variable percentage_ceballos.
+
+Print the variable to the terminal to see its value.
+
+percentage = 100 * total/len(list)
+4.
+In the real election, 54% of the 10,000 town population voted for Cynthia Ceballos. Your supervisors are concerned because this is a very different outcome than what the poll predicted. They want you to determine if there is something wrong with the poll or if given the sample size, it was an entirely reasonable result.
+
+Generate a binomial distribution that takes the number of total survey responses, the actual success rate, and the size of the town’s population as its parameters. Then divide the distribution by the number of survey responses. Save your calculation to the variable possible_surveys.
+
+a = np.random.binomial(N, P, size=10000) / N.
+Where N is the number of trials, P is the probability of success, and size is the total population. Also notice the period at the end of the line of code above. The period ensures that you are dividing each element in a by a float.
+
+If you do not include the period, Python will assume you want integer division (an integer divided by an integer). Naturally, integer division returns an integer. For quotients less than 1 (for example, 7 divided by 18), this is problematic. Python will return a 0 (as opposed to a decimal, like 0.388), which can result in erroneous calculations.
+
+5.
+Plot a histogram of possible_surveys with a range of 0-1 and 20 bins.
+
+plt.hist(array, range=(a, b), bins=n)
+6.
+As we saw, 47% of people we surveyed said they would vote for Ceballos, but 54% of people voted for Ceballos in the actual election.
+
+Calculate the percentage of surveys that could have an outcome of Ceballos receiving less than 50% of the vote and save it to the variable ceballos_loss_surveys.
+
+Print the variable to the terminal.
+
+np.mean(array < 0.5)
+7.
+With this current poll, about 20% of the time a survey output would predict Kerrigan winning, even if Ceballos won the actual election.
+
+Your co-worker points out that your poll would be more accurate if it had more responders.
+
+Generate another binomial distribution, but this time, see what would happen if you had instead surveyed 7,000 people. Divide the distribution by the size of the survey and save your findings to large_survey.
+
+8.
+Now, recalculate the percentage of surveys that would have an outcome of Ceballos losing and save it to the variable ceballos_loss_new, and print the value to the terminal.
+
+What do we notice about this new value?
+
+What advice would you give to your supervisors about predicting results from surveys?
+
+9.
+Click here for a video walkthrough from our experts to help you check your work!
+#--------------------------------------------------------------------
+
+
+import codecademylib
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+survey_responses = ['Ceballos', 'Kerrigan', 'Ceballos', 'Ceballos', 'Ceballos','Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Ceballos', 
+'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Ceballos', 'Ceballos', 'Ceballos', 'Ceballos',
+'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Ceballos',
+'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Ceballos', 'Ceballos', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Kerrigan', 'Ceballos']
+
+#total_ceballos = survey_responses.count("Ceballos")
+total_ceballos = sum([1 for response in survey_responses if response == "Ceballos"])
+servey_length = float(len(survey_responses))
+#percentage_ceballos = total_ceballos / 70.
+percentage_ceballos = total_ceballos / servey_length
+print total_ceballos
+print percentage_ceballos
+
+possible_surveys = np.random.binomial(servey_length,.54,size = 10000) / servey_length
+
+plt.hist(possible_surveys, bins = 20, range = (0,1))
+plt.show()
+
+#Codecademy answer
+possible_serveys_length = float(len(possible_surveys))
+incorrect_predicitons = len(possible_surveys[possible_surveys < 0.5 ])
+ceballos_loss_surveys = incorrect_predicitons / possible_serveys_length
+print ceballos_loss_surveys
+
+#Xu's answer
+ceballos_loss_surveys = np.mean(possible_surveys < 0.5)
+print (ceballos_loss_surveys)
+
+#Codecademy answer
+large_survey_length = float (7000)
+large_survey = np.random.binomial(large_survey_length, 0.54, size = 10000) / large_survey_length
+
+incorrect_predictions = len(large_survey[large_survey < 0.5])
+ceballos_loss_new = incorrect_predictions / large_survey_length
+#Xu's answer
+large_survey = np.random.binomial(7000, 0.54, size = 10000) / 7000.
+
+ceballos_loss_new = np.mean(large_survey < 0.5)
+
+print (ceballos_loss_new)
+
+
+
+
