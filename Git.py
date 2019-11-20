@@ -6,6 +6,9 @@ git status
 git add filename [can be multiple filename s]
 git add . # add every file in the staging area
 
+#(use "git restore --staged <file>..." to unstage)
+
+
 git diff filename
 #compare working directory and staging area
 #can also use "git diff" to check last changes
