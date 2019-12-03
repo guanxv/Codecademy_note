@@ -248,7 +248,33 @@ FROM news
 WHERE publisher LIKE "%Wall%" AND category = "t"
 ORDER BY id DESC;
 
+SELECT population, year
+FROM population_years
+WHERE country = "Gabon"
+ORDER BY population DESC
+LIMIT 5;
 
+SELECT population, country
+FROM population_years
+WHERE year = 2005
+ORDER BY population 
+LIMIT 10;
+
+SELECT DISTINCT country, population
+FROM population_years
+WHERE year = 2010 AND population > 100
+ORDER BY population DESC;
+
+SELECT DISTINCT country
+FROM population_years
+WHERE country LIKE "%Islands%";
+
+SELECT year, population
+FROM population_years
+WHERE country = "Indonesia"
+ORDER BY year;
+
+------------------------- END OF SAMPLES ------------------------------------------
 
 
 
