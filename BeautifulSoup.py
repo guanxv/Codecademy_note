@@ -529,6 +529,80 @@ plt.show()
 
 plt.clf()
 
+#------------note from corey schafer--------------------------------------------------------------
+
+pip install beautifulsoup4
+			lxml
+			html5lib
+			requests
+
+from bs4 import BeautifulSoup
+improt requests
+with open ('simple.html') as html_file:
+	soup = BeautifulSoup(html.file, 'lxml')
+
+soup.prettify()
+
+match = soup.title # get first title
+print(match.text)
+
+match = soup.div
+match = soup.find('div', class = "footer")
+
+article = soup.find('div', class = 'article')
+
+#<div class = "article">
+#	<h2> <a herf = "article_l.html"> .....
+#	<p> ..... </p>
+#	</div>
+
+headline = article.h2.a.text
+summary = article.p.text
+
+for article in soup.find_all('div', class = 'article'):
+	headline = article.h2.a.text
+	summary = article.p.text
+	
+	
+	
+	
+
+from bs4 import BeautifulSoup
+import requests
+
+source = requests.get('https://xxx.xxx.com').text
+soup = BeautifulSoup(source, 'lxml')
+soup.prettify()
+
+article = soup.find('article')
+headline = article.h2.a.text
+summary = articl.find('div', class = 'entry-content').p.text
+vid_src = article.find('iframe', class = 'youtubeplay')['src']
+#to access the results as a dictionary, use ['src'] at the end
+
+#http://www.youtube.com/embedkdkjfdorij....
+
+vid_id = vid.split(',')[4]
+
+yt-link = f'https://youtube.com/watch?v={vid_id}'
+
+article = soup.find('article')
+for article in soup.find_all('article'):
+	head = ....
+	summary = ....
+	vid_src = .....
+	
+	try:
+		vid_scr = .....
+		vid_id = ......
+		yt-link = f'https://youtube.com/watch?v={vid_id}'
+	except Exception as e:
+		yt-link = None
+		
+		
+
+
+
 
 
 

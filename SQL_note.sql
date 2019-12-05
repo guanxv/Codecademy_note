@@ -308,7 +308,283 @@ NOT NULL columns must have a value. Attempts to insert a row without a value for
 */
 
 
+COUNT(): count the number of rows
+SUM(): the sum of the values in a column
+MAX()/MIN(): the largest/smallest value
+AVG(): the average of the values in a column
+ROUND(): round the values in the column
 
+SELECT COUNT(*) 
+FROM fake_apps; --count all the how many rows
+
+SELECT COUNT(*)
+FROM  fake_apps
+WHERE price = 0; -- count how many free apps
+
+SELECT SUM(downloads)
+FROM fake_apps; -- sum all the downloads
+
+SELECT MIN(downloads)
+FROM fake_apps;
+
+SELECT AVG(downloads)
+FROM fake_apps;
+
+SELECT name, ROUND(price, 0) -- return price column with 0 decimal
+FROM fake_apps;
+
+SELECT ROUND(AVG(price), 2) --Get average price and round it to 2 decimal
+FROM fake_apps;
+
+--###############
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 1999;
+
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 2000;
+
+SELECT AVG(imdb_rating)
+FROM movies
+WHERE year = 2001;
+
+--instead of above code, we can use below code 
+SELECT year,
+   AVG(imdb_rating)
+FROM movies
+GROUP BY year
+ORDER BY year;
+
+SELECT price, COUNT(*)
+FROM fake_apps
+GROUP BY price;
+
+/*
+return
+price	COUNT(*)
+0.0	73
+0.99	43
+1.99	42
+2.99	21
+3.99	9
+14.99	12
+*/
+
+SELECT price, COUNT(*)
+FROM fake_apps
+WHERE downloads > 20000
+GROUP BY price;
+
+/*
+return
+price	COUNT(*)
+0.0	26
+0.99	17
+1.99	18
+2.99	7
+3.99	5
+14.99	5
+*/
+
+SELECT category, SUM(downloads)
+FROM fake_apps
+GROUP BY category;
+
+/*
+category	SUM(downloads)
+Books	160864
+Business	178726
+Catalogs	186158
+Education	184724
+Entertainment	95168
+Finance	178163
+Food & Drink	90950
+Games	256083
+Health & Fitness	165555
+Lifestyle	166832
+*/
+
+SELECT category, COUNT(downloads)  --Same result as count *
+FROM fake_apps
+GROUP BY category;
+
+/*
+category	COUNT(downloads)
+Books	8
+Business	10
+Catalogs	9
+Education	13
+Entertainment	8
+Finance	9
+Food & Drink	5
+Games	17
+Health & Fitness	9
+Lifestyle	10
+*/
+
+----------------------
+
+SELECT ROUND(imdb_rating),
+   COUNT(name)
+FROM movies
+GROUP BY ROUND(imdb_rating)
+ORDER BY ROUND(imdb_rating);
+
+--code is same above
+SELECT ROUND(imdb_rating),
+   COUNT(name)
+FROM movies
+GROUP BY 1
+ORDER BY 1;
+
+------------------
+
+SELECT category, 
+   price,
+   AVG(downloads)
+FROM fake_apps
+GROUP BY category, price;
+
+SELECT category, 
+   price,
+   AVG(downloads)
+FROM fake_apps
+GROUP BY 1, 2;
+
+-------------
+
+SELECT year,
+   genre,
+   COUNT(name)
+FROM movies
+GROUP BY 1, 2
+HAVING COUNT(name) > 10;
+
+/*
+You just learned how to use aggregate functions to perform calculations on your data. What can we generalize so far?
+
+COUNT(): count the number of rows
+SUM(): the sum of the values in a column
+MAX()/MIN(): the largest/smallest value
+AVG(): the average of the values in a column
+ROUND(): round the values in the column
+Aggregate functions combine multiple rows together to form a single value of more meaningful information.
+
+GROUP BY is a clause used with aggregate functions to combine data from one or more columns.
+HAVING limit the results of a query based on an aggregate property.
+*/
+
+/*
+Column References
+
+The GROUP BY and ORDER BY clauses can reference the selected columns by number in which they appear in the SELECT statement. The example query will count the number of movies per rating, and will:
+
+GROUP BY column 2 (rating)
+ORDER BY column 1 (total_movies)
+*/
+
+
+SELECT COUNT(*) AS 'total_movies', 
+   rating 
+FROM movies 
+GROUP BY 2 
+ORDER BY 1;
+
+/*
+SUM() Aggregate Function
+
+The SUM() aggregate function takes the name of a column as an argument and returns the sum of all the value in that column.
+*/
+
+
+SELECT SUM(salary)
+FROM salary_disbursement;
+
+/*
+MAX()
+Aggregate Function
+
+The MAX() aggregate function in SQL takes the name of a column as an argument and returns the largest value in a column. The given query will return the largest value from the amount column.
+*/
+
+
+SELECT MAX(amount) 
+FROM transactions;
+
+/*
+COUNT() Aggregate Function
+
+The COUNT() aggregate function in SQL returns the total number of rows that match the specified criteria. For instance, to find the total number of employees who have less than 5 years of experience, the given query can be used.
+
+Note: A column name of the table can also be used instead of *. Unlike COUNT(*), this variation COUNT(column) will not count NULL values in that column.
+
+*/
+
+SELECT COUNT(*)
+FROM employees
+WHERE experience < 5;
+
+/*
+GROUP BY Clause
+
+The GROUP BY clause will group records in a result set by identical values in one or more columns. It is often used in combination with aggregate functions to query information of similar records. The GROUP BY clause can come after FROM or WHERE but must come before any ORDER BY or LIMIT clause.
+
+The given query will count the number of movies per rating.
+*/
+
+SELECT rating, 
+   COUNT(*) 
+FROM movies 
+GROUP BY rating;
+
+/*
+
+MIN() Aggregate Function
+
+The MIN() aggregate function in SQL returns the smallest value in a column. For instance, to find the smallest value of the amount column from the table named transactions, the given query can be used.
+
+*/
+
+SELECT MIN(amount) 
+FROM transactions;
+
+/*
+AVG() Aggregate Function
+
+The AVG() aggregate function returns the average value in a column. For instance, to find the average salary for the employees who have less than 5 years of experience, the given query can be used.
+
+*/
+
+SELECT AVG(salary)
+FROM employees
+WHERE experience < 5;
+
+/*
+HAVING Clause
+
+The HAVING clause is used to further filter the result set groups provided by the GROUP BY clause. HAVING is often used with aggregate functions to filter the result set groups based on an aggregate property. The given query will select only the records (rows) from only years where more than 5 movies were released per year.
+
+
+*/
+
+SELECT year, 
+   COUNT(*) 
+FROM movies 
+GROUP BY year
+HAVING COUNT(*) > 5;
+
+/*
+ROUND() Function
+
+The ROUND() function will round a number value to a specified number of places. It takes two arguments: a number, and a number of decimal places. It can be combined with other aggregate functions, as shown in the given query. This query will calculate the average rating of movies from 2015, rounding to 2 decimal places.
+
+*/
+
+SELECT year, 
+   ROUND(AVG(rating), 2) 
+FROM movies 
+WHERE year = 2015
 
 
 
