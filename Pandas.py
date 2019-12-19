@@ -1030,11 +1030,36 @@ df.rename(columns = {'old_name' : 'new_name',
 					 'old_name1' : 'new_name1'},
 					 inplace = True)
 					 
+#------------------read excel file---------------------
+
+import io
+import requests
+import pandas as pd
+from zipfile import ZipFile
+r = requests.get('http://www.contextures.com/SampleData.zip')
+ZipFile(io.BytesIO(r.content)).extractall()
+
+df = pd.read_excel('SampleData.xlsx', sheet_name='SalesOrders')
 					 
 
+#----------------- read html file ------------------
 
+dfs = pd.read_html(html_string)
 
+dfs = pd.read_html('http://www.contextures.com/xlSampleData01.html')
 
+df = pd.read_html(html_string, header=0)[0]
+#since there could be many tables in one html, dfs stands for many df . and [0] indicate the first one.
+
+#header = 0 only used when header become one row of data 
+
+#--------------- to excel ---------------
+
+df.to_csv('ozito.csv')
+
+df1.to_excel("output.xlsx")
+
+df1.to_excel("output.xlsx", sheet_name='Sheet_name_1')
 
 
 

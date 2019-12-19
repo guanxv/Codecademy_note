@@ -586,5 +586,220 @@ SELECT year,
 FROM movies 
 WHERE year = 2015
 
+/*
 
+order_id	customer_id	subscription_id	purchase_date
+1	3	2	01-10-2017
+2	2	4	01-9-2017
+3	3	4	01-26-2017
+4	9	9	01-4-2017
+5	7	5	01-25-2017
+subscription_id	description	price_per_month	subscription_length
+1	Politics Magazine	10	12 months
+2	Politics Magazine	11	6 months
+3	Politics Magazine	12	3 months
+4	Fashion Magazine	15	12 months
+5	Fashion Magazine	17	6 months
+customer_id	customer_name	address	
+1	Allie Rahaim	123 Broadway	
+2	Jacquline Diddle	456 Park Ave.	
+3	Lizabeth Letsche	789 Main St.	
+4	Jessia Butman	1 Columbus Ave.	
+5	Inocencia Goyco	12 Amsterdam Ave.	
 
+*/
+
+--If we want to combine orders and customers, we would type:
+
+SELECT *
+FROM orders
+JOIN customers
+ON orders.customer_id = customers.customer_id;
+
+-------------------------------------------------
+  
+SELECT *
+FROM orders
+JOIN subscriptions
+ON orders.subscription_id = subscriptions.subscription_id
+WHERE subscriptions.description = 'Fashion Magazine';
+  
+-----------------------
+
+SELECT COUNT(*)
+FROM newspaper;
+
+SELECT COUNT(*)
+FROM online;
+
+SELECT COUNT(*)
+FROM newspaper
+JOIN online
+ON newspaper.id = online.id;
+
+--above IS INNER JOIN. any records not match will be disrgraeded
+
+SELECT *
+FROM table1
+LEFT JOIN table2
+  ON table1.c2 = table2.c2;
+  
+SELECT *
+FROM newspaper
+LEFT JOIN online
+  ON newspaper.id = online.id
+WHERE online.id IS NULL;
+
+-- above is a left join, left side information will override the right side info if dont match.
+
+/*
+------Primary Key vs Foreign Key-----
+Let’s return to our example of the magazine subscriptions. Recall that we had three tables: orders, subscriptions, and customers.
+
+Each of these tables has a column that uniquely identifies each row of that table:
+
+order_id for orders
+subscription_id for subscriptions
+customer_id for customers
+These special columns are called primary keys.
+
+Primary keys have a few requirements:
+
+**None of the values can be NULL.
+**Each value must be unique (i.e., you can’t have two customers with the same customer_id in the customers table).
+**A table can not have more than one primary key column.
+**Let’s reexamine the orders table:
+
+order_id	customer_id	subscription_id	purchase_date
+1	2	3	2017-01-01
+2	2	2	2017-01-01
+3	3	1	2017-01-01
+
+Note that customer_id (the primary key for customers) and subscription_id (the primary key for subscriptions) both appear in this.
+
+When the primary key for one table appears in a different table, it is called a foreign key.
+
+So customer_id is a primary key when it appears in customers, but a foreign key when it appears in orders.
+
+In this example, our primary keys all had somewhat descriptive names. Generally, the primary key will just be called id. Foreign keys will have more descriptive names.
+
+Why is this important? The most common types of joins will be joining a foreign key from one table with the primary key from another table. For instance, when we join orders and customers, we join on customer_id, which is a foreign key in orders and the primary key in customers.
+*/
+
+--cross join
+
+SELECT shirts.shirt_color,
+   pants.pants_color
+FROM shirts
+CROSS JOIN pants;
+
+--If we have 3 different shirts (white, grey, and olive) and 2 different pants (light denim and black), the results might look like this:
+
+/*
+
+shirt_color	pants_color
+white	light denim
+white	black
+grey	light denim
+grey	black
+olive	light denim
+olive	black
+
+*/
+
+SELECT *
+FROM newspaper
+CROSS JOIN months
+WHERE newspaper.start_month <= months.month AND newspaper.end_month >= months.month;
+
+------
+
+SELECT month,
+   COUNT(*)
+FROM newspaper
+CROSS JOIN months
+WHERE start_month <= month 
+   AND end_month >= month
+GROUP BY month
+
+/* Results
+month	COUNT(*)
+1	2
+2	9
+3	13
+4	17
+5	27
+6	30
+7	20
+8	22
+9	21
+10	19
+11	15
+12	10
+*/
+
+-- month table only contain number from 1 to 12.
+
+--Union-------------------
+/*
+table1:
+
+pokemon	type
+Bulbasaur	Grass
+Charmander	Fire
+Squirtle	Water
+
+table2:
+
+pokemon	type
+Snorlax	Normal
+
+If we combine these two with UNION:*/
+
+SELECT *
+FROM table1
+UNION
+SELECT *
+FROM table2;
+
+/*The result would be:
+
+pokemon	type
+Bulbasaur	Grass
+Charmander	Fire
+Squirtle	Water
+Snorlax	Normal
+
+SQL has strict rules for appending data:
+
+Tables must have the same number of columns.
+The columns must have the same data types in the same order as the first table.*/
+
+--- WITH -------------------------
+
+WITH previous_results AS (
+   SELECT ...
+   ...
+   ...
+   ...
+)
+SELECT *
+FROM previous_results
+JOIN customers
+  ON _____ = _____;
+  
+/*The WITH statement allows us to perform a separate query (such as aggregating customer’s subscriptions)
+previous_results is the alias that we will use to reference any columns from the query inside of the WITH clause
+We can then go on to do whatever we want with this temporary table (such as join the temporary table with another table)*/
+
+WITH previous_query AS (
+   SELECT customer_id,
+      COUNT(subscription_id) AS 'subscriptions'
+   FROM orders
+   GROUP BY customer_id
+)
+SELECT customers.customer_name, 
+   previous_query.subscriptions
+FROM previous_query
+JOIN customers
+  ON previous_query.customer_id = customers.customer_id;
