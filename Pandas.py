@@ -894,6 +894,21 @@ df['age']	# method 2
 
 df['name', 'age']
 
+# select certain column sample 2
+
+
+To select columns from a DataFrame:
+
+name = df[['Column1', 'Column2']]
+
+So it should look something like:
+
+x = df[['bedrooms', 'bathrooms', 'size_sqft', 'min_to_subway', 'floor', 'building_age_yrs', 'no_fee', 'has_roofdeck', 'has_washer_dryer', 'has_doorman', 'has_elevator', 'has_dishwasher', 'has_patio', 'has_gym']]
+
+y = df[['rent']]
+
+
+
 # select certain row
 
 df.iloc[2]
@@ -1060,6 +1075,8 @@ df.to_csv('ozito.csv')
 df1.to_excel("output.xlsx")
 
 df1.to_excel("output.xlsx", sheet_name='Sheet_name_1')
+
+
 
 
 
