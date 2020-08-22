@@ -1,3 +1,5 @@
+
+
 # 10 tip and tricks ---------- from corey --------------
 
 #1.-----------
@@ -11950,6 +11952,84 @@ print(recall_score(labels, guesses))
 print(precision_score(labels, guesses))
 print(f1_score(labels, guesses))
 
+
+
+'''
+The Dangers of Overfitting
+Learn about how to recognize when your model is fitting too closely to the training data.
+
+Often in Machine Learning, we feed a huge amount of data to an algorithm that then learns how to classify that input based on rules it creates. The data we feed into this algorithm, the training data, is hugely important. The rules created by the program will be determined by looking at every example in the training data.
+
+Overfitting occurs when we have fit our model’s parameters too closely to the training data:
+
+Image of overfitting
+
+When we overfit, we are assuming that everything we see in the training data is exactly how it will appear in the real world. Instead, we want to be modeling trends that show us the general behavior of a variable:
+
+Image of good fit
+
+That said, when we find trends in training data, all we are doing is replicating trends that already exist. Our model will learn to replicate data from the real world. If that data is part of a system that results in prejudices or injustices, then your machine learning algorithm will produce harmful results as well. Some people say that Machine Learning can be a GIGO process — Garbage In, Garbage Out.
+
+We can imagine an example where an ad agency is creating an algorithm to display the right job recommendations to the right people. If they use a training set of the kinds of people who have high paying jobs to determine which people to show ads for high paying jobs to, the model will probably learn to make decisions that leave out historically underrepresented groups of people.
+
+This problem is fundamentally a problem with overfitting to our training set. If we overfit to training sets with underrepresentation, we only create more underrepresentation. How do we tackle this problem?
+
+Inspect Training Data First
+Find the important aggregate statistics for the variables you’re measuring. Find the mean and median of different variables. Use groupby to inspect the aggregate statistics for different groups of data, and see how they differ. These are the trends that your machine learning model will replicate.
+
+Visualize your training data and look for outstanding patterns.
+
+Compare the aggregate statistics from your specific training set to aggregate statistics from other sources. Does your training set seem to follow the trends that are universally present?
+
+Collect Data Thoughtfully
+If you have the power to control the way your data is collected, i.e. if you’re the one collecting the data, make sure that you are sampling from all groups.
+
+Imagine for a massively multiplayer app, rewards and hotspots are set by an algorithm that trains on frequencies of user actions. If the people using the app overwhelmingly are in one area, the app will continuously get better and better for people in that area.
+
+Some neighborhoods/areas might be undersampled, or have significantly less datapoints, so the algorithm will fit to the oversampled population. Imagine this clustering forming:
+
+bad clustering
+
+The small cluster in the bottom left would probably be a cluster of its own, if it had a comparable amount of samples to the other two clusters. To solve this, we can specifically oversample areas that are undersampled, and add more datapoints there. Conversely, we can undersample groups that are over-represented in our training set.
+
+Try to Augment the Training Data
+In our Bayes’ Theorem lesson we discussed that when we have a small total number of an event, this will affect how reliably we can guess if the event will occur. Many systems built to detect fraud suffer from this problem. Suppose we were creating a machine learning model to detect fraudulent credit card activity. On the aggregate, there are very few fraudulent transactions, so the model can reach a very high accuracy by simply predicting that every transaction is legitimate. This approach would not solve our problem very well.
+
+One technique is to identify a fraudulent transaction and make many copies of it in the training set, with small variations in the feature data. We can imagine that if our training set has only 2 examples of fraud, the algorithm will overfit to only identify a transaction as fraudulent if it has the exact characteristics of those couple of examples. When we augment the training data with more fraudulent examples, mildly altered from the ones we know, we reduce the amount of overfitting.
+
+Data augmentation is used most often in image classification techniques. Often, we add copies of each picture with an added rotation, shearing, or color jittering.
+
+Let’s imagine we have a huge dataset of animals, and we’re trying to classify which animal is which. We may only have one instance of an alpaca:
+
+alpaca
+
+but we know that this image, sheared:
+
+alpaca sheared
+
+and this image rotated:
+
+alpaca upside-down
+
+are all also examples of an alpaca. When we add these examples of augmented data to our training set, the model won’t overfit as much.
+
+Try Restricting the Featureset
+If one of your features is more heavily affecting the parameters of the model, try to run your model without that feature.
+
+For example, let’s say you are writing a program to determine if someone’s loan application should be accepted or rejected. Your model shows that the most significant variable is their race — with all other features the same, the model has a much higher chance of producing an “accept” prediction on an application from a white applicant than on a non-white applicant. This parameter weight may be a sign that the training data contained racial bias. We can try to train the model again, with the race data removed from the featureset.
+
+Reflection
+Machine Learning algorithms always must introduce a bias as a function of being programs that are trying to make assumptions and rules by looking at data.
+
+Sometimes the best way to deal with the introduction of bias in a training set is to just acknowledge that it is there. As we try to compensate for the bias, our methods of compensation themselves introduce a bias. It is important to find a balance. The most important thing is to mention the existence of bias in your results, and make sure that all stakeholders know that it exists, so that it is taken into consideration with the decisions made from your model’s results.'''
+
+
+
+
+
+
+
+
 '''
 K-NEAREST NEIGHBORS
 K-Nearest Neighbors Classifier
@@ -12569,6 +12649,160 @@ To the right is an interactive visualization of K-Nearest Neighbors. If you move
 
 If you find any interesting patterns, share it with us on Twitter!
 '''
+'''
+K-NEAREST NEIGHBOR REGRESSOR
+Regression
+The K-Nearest Neighbors algorithm is a powerful supervised machine learning algorithm typically used for classification. However, it can also perform regression.
+
+In this lesson, we will use the movie dataset that was used in the K-Nearest Neighbors classifier lesson. However, instead of classifying a new movie as either good or bad, we are now going to predict its IMDb rating as a real number.
+
+This process is almost identical to classification, except for the final step. Once again, we are going to find the k nearest neighbors of the new movie by using the distance formula. However, instead of counting the number of good and bad neighbors, the regressor averages their IMDb ratings.
+
+For example, if the three nearest neighbors to an unrated movie have ratings of 5.0, 9.2, and 6.8, then we could predict that this new movie will have a rating of 7.0.
+'''
+
+
+
+from movies import movie_dataset, movie_ratings
+
+def distance(movie1, movie2):
+  squared_difference = 0
+  for i in range(len(movie1)):
+    squared_difference += (movie1[i] - movie2[i]) ** 2
+  final_distance = squared_difference ** 0.5
+  return final_distance
+
+def predict(unknown, dataset, movie_ratings, k):
+  distances = []
+  sum_rating = 0
+  avg_rating = 0
+  #Looping through all points in the dataset
+  for title in dataset:
+    movie = dataset[title]
+    distance_to_point = distance(movie, unknown)
+    #Adding the distance and point associated with that distance
+    distances.append([distance_to_point, title])
+  distances.sort()
+  #Taking only the k closest points
+  neighbors = distances[0:k]
+
+
+  for neighbor in neighbors:
+    title = neighbor[1]
+    rating = movie_ratings[title]
+    sum_rating += rating
+  avg_rating = sum_rating / (len(neighbors))
+  return avg_rating
+
+
+
+print(movie_dataset['Life of Pi'])
+print(movie_ratings['Life of Pi'])
+print(predict([0.016, 0.300, 1.022], movie_dataset, movie_ratings, 5))
+
+'''
+K-NEAREST NEIGHBOR REGRESSOR
+Weighted Regression
+We’re off to a good start, but we can be even more clever in the way that we compute the average. We can compute a weighted average based on how close each neighbor is.
+
+Let’s say we’re trying to predict the rating of movie X and we’ve found its three nearest neighbors. Consider the following table:
+
+Movie	Rating	Distance to movie X
+A	5.0	3.2
+B	6.8	11.5
+C	9.0	1.1
+
+If we find the mean, the predicted rating for X would be 6.93. However, movie X is most similar to movie C, so movie C’s rating should be more important when computing the average. Using a weighted average, we can find movie X’s rating:
+
+(5.0/3.2 + 6.8 / 11.5 + 9.0 / 1.1) / (1/3.2 + 1 / 11.5 + 1 / 1.1) = 7.9
+
+The numerator is the sum of every rating divided by their respective distances. The denominator is the sum of one over every distance. Even though the ratings are the same as before, the weighted average has now gone up to 7.9.
+
+'''
+from movies import movie_dataset, movie_ratings
+
+def distance(movie1, movie2):
+  squared_difference = 0
+  for i in range(len(movie1)):
+    squared_difference += (movie1[i] - movie2[i]) ** 2
+  final_distance = squared_difference ** 0.5
+  return final_distance
+
+def predict(unknown, dataset, movie_ratings, k):
+  distances = []
+  numerator = 0
+  denominator = 0
+  #Looping through all points in the dataset
+  for title in dataset:
+    movie = dataset[title]
+    distance_to_point = distance(movie, unknown)
+    #Adding the distance and point associated with that distance
+    distances.append([distance_to_point, title])
+  distances.sort()
+  #Taking only the k closest points
+  neighbors = distances[0:k]
+  for neighbor in neighbors:
+        numerator += (movie_ratings[neighbor[1]] )/ neighbor[0] 
+    denominator += 1/neighbor[0]
+  return numerator / denominator
+
+print(predict([0.016, 0.300, 1.022], movie_dataset, movie_ratings, k = 5 ))
+
+'''
+K-NEAREST NEIGHBOR REGRESSOR
+Scikit-learn
+Now that you’ve written your own K-Nearest Neighbor regression model, let’s take a look at scikit-learn’s implementation. The KNeighborsRegressor class is very similar to KNeighborsClassifier.
+
+We first need to create the regressor. We can use the parameter n_neighbors to define our value for k.
+
+We can also choose whether or not to use a weighted average using the parameter weights. If weights equals "uniform", all neighbors will be considered equally in the average. If weights equals "distance", then a weighted average is used.
+'''
+classifier = KNeighborsRegressor(n_neighbors = 3, weights = "distance")'''
+Next, we need to fit the model to our training data using the .fit() method. .fit() takes two parameters. The first is a list of points, and the second is a list of values associated with those points.
+'''
+training_points = [
+  [0.5, 0.2, 0.1],
+  [0.9, 0.7, 0.3],
+  [0.4, 0.5, 0.7]
+]
+
+training_labels = [5.0, 6.8, 9.0]
+classifier.fit(training_points, training_labels)'''
+Finally, we can make predictions on new data points using the .predict() method. .predict() takes a list of points and returns a list of predictions for those points.
+'''
+unknown_points = [
+  [0.2, 0.1, 0.7],
+  [0.4, 0.7, 0.6],
+  [0.5, 0.8, 0.1]
+]
+
+guesses = classifier.predict(unknown_points)'''
+'''
+
+#--- code ---
+from movies import movie_dataset, movie_ratings
+from sklearn.neighbors import KNeighborsRegressor
+
+regressor = KNeighborsRegressor(n_neighbors = 5, weights = "distance")
+regressor.fit(movie_dataset, movie_ratings)
+
+#print(regressor.predict([0.016, 0.300, 1.022]))
+#print(regressor.predict([0.0004092981, 0.283, 1.0112]))
+#print(regressor.predict([0.00687649, 0.235, 1.0112]))
+
+print(regressor.predict([
+  
+  [0.00687649, 0.235, 1.0112],
+  [0.0004092981, 0.283, 1.0112],
+  [0.00687649, 0.235, 1.0112]
+]))
+
+
+
+
+
+
+
 '''
 LOGISTIC REGRESSION
 Introduction
@@ -14154,6 +14388,198 @@ vhigh,vhigh,3,2,small,med,unacc
 vhigh,vhigh,3,2,small,high,unacc
 vhigh,vhigh,3,2,med,low,unacc
 ....
+
+#-#-#-#-#-#-#-#-#-#-#-#-#- DECISION TREE PROEJCT #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+
+'''
+
+MACHINE LEARNING: SUPERVISED LEARNING 🤖
+Find the Flag
+Can you guess which continent this flag comes from?
+
+Flag of Reunion
+What are some of the features that would clue you in? Maybe some of the colors are good indicators. The presence or absence of certain shapes could give you a hint. In this project, we’ll use decision trees to try to predict the continent of flags based on several of these features.
+
+We’ll explore which features are the best to use and the best way to create your decision tree.
+
+If you get stuck during this project or would like to see an experienced developer work through it, click “Get Help“ to see a project walkthrough video.
+
+Tasks
+12/14Complete
+Mark the tasks as complete by checking them off
+Investigate the Data
+1.
+Let’s start by seeing what the data looks like. Begin by loading the data into a variable named flags using Panda’s pd.read_csv() function. The function should take the name of the CSV file you want to load. In this case, our file is named "flags.csv".
+
+We also want row 0 to be used as the header, so include the parameter header = 0.
+
+
+Stuck? Get a hint
+2.
+Take a look at the names of the columns in our DataFrame. These are the features we have available to us. Print flags.columns.
+
+Let’s also take a look at the first few rows of the dataset. Print flags.head().
+
+3.
+Many columns contain numbers that don’t make a lot of sense. For example, the third row, which represents Algeria, has a Language of 8. What exactly does that mean?
+
+Take a look at the Attribute Information for this dataset from UCI’s Machine Learning Repository.
+
+Using that information along with the printout of flags.head(), can you figure out what landmass Andora is on?
+
+Creating Your Data and Labels
+4.
+We’re eventually going to use create a decision tree to classify what Landmass a country is on.
+
+Create a variable named labels and set it equal to only the "Landmass" column from flags.
+
+You can grab specific columns from a DataFrame using this syntax:
+
+one_column = df[["A"]]
+two_columns = df[["B", "C"]]
+In this example, one_column will be a DataFrame of only df‘s "A" column. two_columns will be a DataFrame of the "B" and "C" columns from df.
+
+
+Stuck? Get a hint
+5.
+We have our labels. Now we want to choose which columns will help our decision tree correctly classify those labels.
+
+You could spend a lot of time playing with groups of columns to find the that work best. But for now, let’s see if we can predict where a country is based only on the colors of its flag.
+
+Create a variable named data and set it equal to a DataFrame containing the following columns from flags:
+
+"Red"
+"Green"
+"Blue"
+"Gold"
+"White"
+"Black"
+"Orange"
+
+Stuck? Get a hint
+6.
+Finally, let’s split these DataFrames into a training set and test set using the train_test_split() function. This function should take data and labels as parameters. Also include the parameter random_state = 1.
+
+This function returns four values. Name those values train_data, test_data, train_labels, and test_labels in that order.
+
+
+Stuck? Get a hint
+Make and Test the Model
+7.
+Create a DecisionTreeClassifier and name it tree. When you create the tree, give it the parameter random_state = 1.
+
+
+Stuck? Get a hint
+8.
+Call tree‘s .fit() method using train_data and train_labels to fit the tree to the training data.
+
+
+Stuck? Get a hint
+9.
+Call .score() using test_data and test_labels. Print the result.
+
+Since there are six possible landmasses, if we randomly guessed, we’d expect to be right about 16% of the time. Did our decision tree beat randomly guessing?
+
+Tuning the Model
+10.
+We now have a good baseline of how our model performs with these features. Let’s see if we can prune the tree to make it better!
+
+Put your code that creates, trains, and tests the tree inside a for loop that has a variable named i that increases from 1 to 20.
+
+Inside your for loop, when you create tree, give it the parameter max_depth = i.
+
+We’ll now see a printout of how the accuracy changes depending on how large we allow the tree to be.
+
+
+Stuck? Get a hint
+11.
+Rather than printing the score of each tree, let’s graph it! We want the x-axis to show the depth of the tree and the y-axis to show the tree’s score.
+
+To do this, we’ll need to create a list containing all of the scores. Before the for loop, create an empty list named scores. Inside the loop, instead of printing the tree’s score, use .append() to add it to scores.
+
+
+Stuck? Get a hint
+12.
+Let’s now plot our points. Call plt.plot() using two parameters. The first should be the points on the x-axis. In this case, that is range(1, 21). The second should be scores.
+
+Then call plt.show().
+
+
+Stuck? Get a hint
+13.
+Our graph doesn’t really look like we would expect it to. It seems like the depth of the tree isn’t really having an impact on its performance. This might be a good indication that we’re not using enough features.
+
+Let’s add all the features that have to do with shapes to our data. data should now be set equal to:
+
+flags[["Red", "Green", "Blue", "Gold",
+ "White", "Black", "Orange",
+ "Circles",
+"Crosses","Saltires","Quarters","Sunstars",
+"Crescent","Triangle"]]
+What does your graph look like after making this change?
+
+Explore on Your Own
+14.
+Nice work! That graph looks more like what we’d expect. If the tree is too short, we’re underfitting and not accurately representing the training data. If the tree is too big, we’re getting too specific and relying too heavily on the training data.
+
+There are a few different ways to extend this project:
+
+Try to classify something else! Rather than predicting the "Landmass" feature, could predict something like the "Language"?
+Find a subset of features that work better than what we’re currently using. An important note is that a feature that has categorical data won’t work very well as a feature. For example, we don’t want a decision node to split nodes based on whether the value for "Language" is above or below 5.
+Tune more parameters of the model. You can find a description of all the parameters you can tune in the Decision Tree Classifier documentation. For example, see what happens if you tune max_leaf_nodes. Think about whether you would be overfitting or underfitting the data based on how many leaf nodes you allow.
+'''
+
+
+import codecademylib3_seaborn
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
+
+
+flags = pd.read_csv('flags.csv', header = 0)
+
+#print(flags)
+#print(flags.columns)
+
+labels = flags[['Landmass']]
+
+#data = flags[['Red', 'Green', 'Blue', 'Gold', 'White','Black', 'Orange']]
+data = flags[["Red", "Green", "Blue", "Gold",
+ "White", "Black", "Orange",
+ "Circles",
+"Crosses","Saltires","Quarters","Sunstars",
+"Crescent","Triangle"]]
+
+train_data, test_data, train_label, test_label = train_test_split(data, labels, train_size = 0.8, test_size = 0.2, random_state = 100)
+
+scores = []
+
+
+for i in range(1, 21):
+
+  tree = DecisionTreeClassifier(max_depth = i)
+  tree.fit(train_data, train_label)
+  print('Max Depth = ', i, end = '')
+  print("  The Score is ", tree.score(test_data, test_label))
+  scores.append(tree.score(test_data, test_label))
+
+plt.plot(range(1,21), scores)
+plt.show()
+
+print(data.columns)
+
+flag_to_check = pd.DataFrame ([[1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]], columns =  ['Red', 'Green', 'Blue', 'Gold', 'White', 'Black', 'Orange','Circles','Crosses', 'Saltires', 'Quarters', 'Sunstars', 'Crescent', 'Triangle'])
+#flag_to_check = np.array([1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+
+print(tree.predict(flag_to_check))
+
+
+
+
+#-#-#-#-#-#-#-#-#-#-#-#-#- END OF DECISION TREE PROEJCT #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+
+
 
 '''
 RANDOM FORESTS
@@ -16237,6 +16663,1080 @@ Clustering can also apply to applications that match people together, such as da
 Clustering can also apply to personality tests, like the Myers Briggs personality test, which take certain responses and group you into a certain category based on those responses.
 
 In addition, clustering can also apply when grouping organisms based on their physical traits, such that if you provide information, say for a dog, it should categorize it as that kind of animal.'''
+
+
+
+''' Project
+MACHINE LEARNING: UNSUPERVISED LEARNING 🤖
+Handwriting Recognition using K-Means
+The U.S. Postal Service has been using machine learning and scanning technologies since 1999. Because its postal offices have to look at roughly half a billion pieces of mail every day, they have done extensive research and developed very efficient algorithms for reading and understanding addresses. And not only the post office:
+
+ATMs can recognize handwritten bank checks
+Evernote can recognize handwritten task lists
+Expensify can recognize handwritten receipts
+But how do they do it?
+
+In this project, you will be using K-means clustering (the algorithm behind this magic) and scikit-learn to cluster images of handwritten digits.
+
+Let’s get started!
+
+If you get stuck during this project or would like to see an experienced developer work through it, click “Get Help“ to see a project walkthrough video.
+
+
+1.
+The sklearn library comes with a digits dataset for practice.
+
+In script.py, we have already added three lines of code:
+
+import codecademylib3_seaborn
+import numpy as np
+from matplotlib import pyplot as plt
+From sklearn library, import the datasets module.
+
+Then, load in the digits data using .load_digits() and print digits.
+
+
+Hint
+At this point, your code should look like:
+
+import codecademylib3_seaborn
+import numpy as np
+from matplotlib import pyplot as plt
+from sklearn import datasets
+
+digits = datasets.load_digits()
+print(digits)
+The terminal output should display all the information that comes with the dataset.
+
+2.
+When first starting out with a dataset, it’s always a good idea to go through the data description and see what you can already learn.
+
+Instead of printing the digits, print digits.DESCR.
+
+What is the size of an image (in pixel)?
+Where is this dataset from?
+
+Hint
+Print out the description of the digits data:
+
+print(digits.DESCR)
+The result should look like:
+
+Recognition of Handwritten Digits Data Set
+==========================================
+
+Notes
+-----
+
+Data Set Characteristics:
+
+  :Number of Instances: 5620
+  :Number of Attributes: 64
+  :Attribute Information: 8x8 image of integer pixels in the range 0-16
+  :Missing Attribute Values: None
+  :Creator: E. Alpaydin
+  :Date: July; 1998
+The digit images are 8 x 8. And the dataset is from Bogazici University (Istanbul, Turkey).
+
+3.
+Let’s see what the data looks like!
+
+Print digits.data.
+
+
+Hint
+Print out the data:
+
+print(digits.data)
+[[ 0.  0.  5. ...,  0.  0.  0. ]
+ [ 0.  0.  0. ..., 10. 0.  0. ]
+ [ 0.  0.  0. ..., 16.  9.  0. ]
+... 
+Each list contains 64 values which respent the pixel colors of an image (0-16):
+
+0 is white
+16 is black
+4.
+Next, print out the target values in digits.target.
+
+
+Hint
+Print out the target values:
+
+print(digits.target)
+The result should look like:
+
+[ 0 1 2 ..., 8 9 8]
+This shows us that the first data point in the set was tagged as a 0 and the last one was tagged as an 8.
+
+5.
+To visualize the data images, we need to use Matplotlib. Let’s visualize the image at index 100:
+
+plt.gray() 
+
+plt.matshow(digits.images[100])
+
+plt.show()
+The image should look like:
+
+4
+
+Is it a 4? Let’s print out the target label at index 100 to find out!
+
+print(digits.target[100])
+Open the hint to see how you can visualize more than one image.
+
+
+Hint
+To take a look at 64 sample images. Copy and paste the code below:
+
+# Figure size (width, height)
+
+fig = plt.figure(figsize=(6, 6))
+
+# Adjust the subplots 
+
+fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
+
+# For each of the 64 images
+
+for i in range(64):
+
+    # Initialize the subplots: add a subplot in the grid of 8 by 8, at the i+1-th position
+
+    ax = fig.add_subplot(8, 8, i+1, xticks=[], yticks=[])
+
+    # Display an image at the i-th position
+
+    ax.imshow(digits.images[i], cmap=plt.cm.binary, interpolation='nearest')
+
+    # Label the image with the target value
+
+    ax.text(0, 7, str(digits.target[i]))
+
+plt.show()
+K-Means Clustering:
+6.
+Now we understand what we are working with. Let’s cluster the 1797 different digit images into groups.
+
+Import KMeans from sklearn.cluster.
+
+
+Hint
+from sklearn.cluster import KMeans
+7.
+What should be the k, the number of clusters, here?
+
+Use the KMeans() method to build a model that finds k clusters.
+
+
+Hint
+Because there are 10 digits (0, 1, 2, 3, 4, 5, 6, 7, 8, and 9), there should be 10 clusters.
+
+So k, the number of clusters, is 10:
+
+model = KMeans(n_clusters=10, random_state=42)
+The random_state will ensure that every time you run your code, the model is built in the same way. This can be any number. We used random_state = 42.
+
+8.
+Use the .fit() method to fit the digits.data to the model.
+
+
+Hint
+model.fit(digits.data)
+Visualizing after K-Means:
+9.
+Let’s visualize all the centroids! Because data samples live in a 64-dimensional space, the centroids have values so they can be images!
+
+First, add a figure of size 8x3 using .figure().
+
+Then, add a title using .suptitle().
+
+
+Hint
+fig = plt.figure(figsize=(8, 3))
+
+fig.suptitle('Cluser Center Images', fontsize=14, fontweight='bold')
+10.
+Scikit-learn sometimes calls centroids “cluster centers”.
+
+Write a for loop to displays each of the cluster_centers_ like so:
+
+for i in range(10):
+
+  # Initialize subplots in a grid of 2X5, at i+1th position
+  ax = fig.add_subplot(2, 5, 1 + i)
+
+  # Display images
+  ax.imshow(model.cluster_centers_[i].reshape((8, 8)), cmap=plt.cm.binary)
+The cluster centers should be a list with 64 values (0-16). Here, we are making each of the cluster centers into an 8x8 2D array.
+
+11.
+Outside of the for loop, use .show() to display the visualization.
+
+It should look like:
+
+8
+
+These are the centroids of handwriting from thirty different people collected by Bogazici University (Istanbul, Turkey):
+
+Index 0 looks like 0
+Index 1 looks like 9
+Index 2 looks like 2
+Index 3 looks like 1
+Index 4 looks like 6
+Index 5 looks like 8
+Index 6 looks like 4
+Index 7 looks like 5
+Index 8 looks like 7
+Index 9 looks like 3
+Notice how the centroids that look like 1 and 8 look very similar and 1 and 4 also look very similar.
+
+
+Hint
+plt.show()
+12.
+Optional:
+
+If you want to see another example that visualizes the data clusters and their centers using K-means, check out the sklearn‘s own example.
+
+K-means clustering example
+
+
+Hint
+In this code, they use k-means++ to place the initial centroids.
+
+Testing Your Model:
+13.
+Instead of feeding new arrays into the model, let’s do something cooler!
+
+Inside the right panel, go to test.html.
+
+
+Hint
+https://localhost/test.html
+
+14.
+What year will robots take over the world?
+
+Use your mouse to write a digit in each of the boxes and click Get Array.
+
+
+Hint
+2020?
+
+15.
+Back in script.py, create a new variable named new_samples and copy and paste the 2D array into it.
+
+new_samples = np.array(      )
+
+Hint
+Copy and paste the entire code into the parentheses:
+
+new_samples = np.array(      )
+Make sure to even copy paste the outer square brackets.
+
+16.
+Use the .predict() function to predict new labels for these four new digits. Store those predictions in a variable named new_labels.
+
+
+Hint
+new_labels = model.predict(new_samples)
+
+'''
+
+print(new_labels)
+
+ '''
+17.
+But wait, because this is a clustering algorithm, we don’t know which label is which.
+
+By looking at the cluster centers, let’s map out each of the labels with the digits we think it represents:
+'''
+for i in range(len(new_labels)):
+  if new_labels[i] == 0:
+    print(0, end='')
+  elif new_labels[i] == 1:
+    print(9, end='')
+  elif new_labels[i] == 2:
+    print(2, end='')
+  elif new_labels[i] == 3:
+    print(1, end='')
+  elif new_labels[i] == 4:
+    print(6, end='')
+  elif new_labels[i] == 5:
+    print(8, end='')
+  elif new_labels[i] == 6:
+    print(4, end='')
+  elif new_labels[i] == 7:
+    print(5, end='')
+  elif new_labels[i] == 8:
+    print(7, end='')
+  elif new_labels[i] == 9:
+    print(3, end='')
+    
+    '''
+
+Hint
+We did print(x, end='') so that all the digits are printed on the same line.
+
+Index 0 looks like 0
+Index 1 looks like 9
+Index 2 looks like 2
+Index 3 looks like 1
+Index 4 looks like 6
+Index 5 looks like 8
+Index 6 looks like 4
+Index 7 looks like 5
+Index 8 looks like 7
+Index 9 looks like 3
+18.
+Is the model recognizing your handwriting?
+
+Remember, this model is trained on handwritten digits of 30 Turkish people (from the 1990’s).
+
+Try writing your digits similar to these cluster centers:'''
+
+#script.py---------------
+
+import codecademylib3_seaborn
+import numpy as np
+from matplotlib import pyplot as plt
+
+from sklearn import datasets 
+
+from sklearn.cluster import KMeans 
+
+digits = datasets.load_digits()
+
+#print(digits.DESCR)
+#print(digits.data)
+print(digits.target)
+
+#plt.gray()
+#plt.matshow(digits.images[100])
+#plt.show()
+
+#print(digits.target[100])
+
+model = KMeans(n_clusters = 10, random_state = 42)
+model.fit(digits.data)
+
+fig = plt.figure(figsize = (8,3))
+fig.suptitle('Cluser Center Images', fontsize=14, fontweight='bold')
+
+for i in range(10):
+
+  # Initialize subplots in a grid of 2X5, at i+1th position
+  ax = fig.add_subplot(2, 5, 1 + i)
+
+  # Display images
+  ax.imshow(model.cluster_centers_[i].reshape((8, 8)), cmap=plt.cm.binary)
+
+plt.show()
+
+
+new_samples = np.array([
+[0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.15,2.82,5.65,6.10,3.82,0.84,4.50,5.19,7.32,7.63,6.57,6.87,5.34,1.30,6.03,6.11,4.43,2.07,0.30,7.02,4.81,0.00,0.00,0.00,0.00,0.00,4.20,7.63,1.60,0.00,0.00,0.00,0.00,1.60,7.48,5.12,0.00,0.00,0.00,0.00,0.00,1.52,4.96,0.77,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00],
+[0.00,0.00,5.04,7.55,6.03,1.45,0.00,0.00,0.00,0.00,7.47,5.87,6.72,7.10,0.46,0.00,0.00,0.15,7.63,3.66,1.75,7.63,3.13,0.00,0.00,1.07,7.62,2.75,0.08,5.96,6.71,0.08,0.00,1.52,7.63,2.21,0.00,2.82,7.63,1.45,0.00,0.08,2.75,0.23,0.00,2.90,7.63,1.22,0.00,0.00,0.00,0.00,0.00,4.58,7.17,0.08,0.00,0.00,0.00,0.00,0.00,4.19,7.40,0.00],
+[0.00,0.00,0.00,1.15,6.41,6.41,2.98,0.00,0.00,0.00,0.61,6.87,6.87,5.88,7.63,2.60,0.00,0.00,4.66,7.48,1.37,0.08,6.87,5.04,0.00,1.53,7.62,4.27,0.00,0.00,6.72,5.12,0.00,1.52,5.80,0.38,0.00,1.76,7.63,3.14,0.00,0.00,0.00,0.00,0.00,4.28,7.33,0.31,0.00,0.00,0.00,0.00,0.00,5.65,6.11,0.00,0.00,0.00,0.00,0.00,0.15,7.10,4.89,0.00],
+[0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.46,5.34,7.63,7.55,5.34,1.22,0.00,0.00,5.34,7.40,3.97,4.04,7.17,7.55,0.00,1.60,7.63,3.66,0.00,0.07,2.67,7.40,0.00,0.91,4.27,0.30,0.69,7.02,7.63,6.94,0.00,0.00,0.00,0.00,1.53,7.63,3.82,0.38,0.00,0.00,0.00,0.00,0.61,6.94,5.19,0.00]
+])
+
+
+new_labels = model.predict(new_samples)
+
+for i in range(len(new_labels)):
+  if new_labels[i] == 0:
+    print(0, end='')
+  elif new_labels[i] == 1:
+    print(9, end='')
+  elif new_labels[i] == 2:
+    print(2, end='')
+  elif new_labels[i] == 3:
+    print(1, end='')
+  elif new_labels[i] == 4:
+    print(6, end='')
+  elif new_labels[i] == 5:
+    print(8, end='')
+  elif new_labels[i] == 6:
+    print(4, end='')
+  elif new_labels[i] == 7:
+    print(5, end='')
+  elif new_labels[i] == 8:
+    print(7, end='')
+  elif new_labels[i] == 9:
+    print(3, end='')
+
+
+# test.html--------------------------
+
+<html>
+<head>
+</head>
+  
+<body onload="InitThis();">
+  
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    
+  <script type="text/javascript" src="JsCode.js"></script>
+    <div align="center">
+      
+        <canvas id="myCanvas" width="80" height="80" style="border:2px solid black"></canvas>
+        
+      <canvas id="myCanvas2" width="80" height="80" style="border:2px solid black"></canvas>
+      
+      <canvas id="myCanvas3" width="80" height="80" style="border:2px solid black"></canvas>
+      
+      <canvas id="myCanvas4" width="80" height="80" style="border:2px solid black"></canvas>
+      
+        <br /><br />
+        <button onclick="javascript:clearArea();return false;">Clear Area</button>
+        Line width : <select id="selWidth">
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="14" selected="selected">14</option>
+            <option value="18">18</option>
+        </select>
+        Color : <select id="selColor">
+            <option value="#141c3a">black</option>
+            <option value="#6400e4">purple</option>
+            <option value="#4b35ef" selected="selected">royal-blue</option>
+            <option value="#fa4359">red</option>
+            <option value="#37c3be">mint</option>
+            <option value="#ffc107">yellow</option>
+            <option value="#cccccc">gray</option>
+        </select>
+         
+      <button onclick="javascript:array();return false;">Get Array</button>
+
+      
+    </div>
+ 
+    <pre id="opening_bracket">
+  </pre>
+  
+   <pre id="display">
+   </pre>
+  
+  <pre id="display2">
+  </pre>
+  
+   <pre id="display3">
+  </pre>
+  
+   <pre id="display4">
+  </pre>
+  
+  <pre id="closing_bracket">
+  </pre>
+  
+  
+  
+
+</body>
+</html>
+
+#JsCode.js------------------------
+
+var mousePressed = false;
+var lastX, lastY;
+var ctx;
+
+function InitThis() {
+  
+  // ========= 1
+  
+    ctx = document.getElementById('myCanvas').getContext("2d");
+
+    $('#myCanvas').mousedown(function (e) {
+        mousePressed = true;
+        Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+    });
+
+    $('#myCanvas').mousemove(function (e) {
+        if (mousePressed) {
+            Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
+        }
+    });
+
+    $('#myCanvas').mouseup(function (e) {
+        mousePressed = false;
+    });
+	    $('#myCanvas').mouseleave(function (e) {
+        mousePressed = false;
+    });
+ 
+   // =========== 2
+  
+   ctx2 = document.getElementById('myCanvas2').getContext("2d");
+
+    $('#myCanvas2').mousedown(function (e) {
+        mousePressed = true;
+        Draw2(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+    });
+
+    $('#myCanvas2').mousemove(function (e) {
+        if (mousePressed) {
+            Draw2(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
+        }
+    });
+
+    $('#myCanvas2').mouseup(function (e) {
+        mousePressed = false;
+    });
+	    $('#myCanvas2').mouseleave(function (e) {
+        mousePressed = false;
+    });
+  
+  
+  // 3==========
+  
+   ctx3 = document.getElementById('myCanvas3').getContext("2d");
+
+    $('#myCanvas3').mousedown(function (e) {
+        mousePressed = true;
+        Draw3(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+    });
+
+    $('#myCanvas3').mousemove(function (e) {
+        if (mousePressed) {
+            Draw3(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
+        }
+    });
+
+    $('#myCanvas3').mouseup(function (e) {
+        mousePressed = false;
+    });
+	    $('#myCanvas3').mouseleave(function (e) {
+        mousePressed = false;
+    });
+  
+  
+  // 4 =================
+  
+   ctx4 = document.getElementById('myCanvas4').getContext("2d");
+
+    $('#myCanvas4').mousedown(function (e) {
+        mousePressed = true;
+        Draw4(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+    });
+
+    $('#myCanvas4').mousemove(function (e) {
+        if (mousePressed) {
+            Draw4(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
+        }
+    });
+
+    $('#myCanvas4').mouseup(function (e) {
+        mousePressed = false;
+    });
+	    $('#myCanvas4').mouseleave(function (e) {
+        mousePressed = false;
+    });
+  
+  
+  
+}
+
+
+
+
+function Draw(x, y, isDown) {
+    if (isDown) {
+        ctx.beginPath();
+        ctx.strokeStyle = $('#selColor').val();
+        ctx.lineWidth = $('#selWidth').val();
+        ctx.lineJoin = "round";
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    lastX = x; lastY = y;
+}
+
+function Draw2(x, y, isDown) {
+    if (isDown) {
+        ctx2.beginPath();
+        ctx2.strokeStyle = $('#selColor').val();
+        ctx2.lineWidth = $('#selWidth').val();
+        ctx2.lineJoin = "round";
+        ctx2.moveTo(lastX, lastY);
+        ctx2.lineTo(x, y);
+        ctx2.closePath();
+        ctx2.stroke();
+    }
+    lastX = x; lastY = y;
+}
+
+function Draw3(x, y, isDown) {
+    if (isDown) {
+        ctx3.beginPath();
+        ctx3.strokeStyle = $('#selColor').val();
+        ctx3.lineWidth = $('#selWidth').val();
+        ctx3.lineJoin = "round";
+        ctx3.moveTo(lastX, lastY);
+        ctx3.lineTo(x, y);
+        ctx3.closePath();
+        ctx3.stroke();
+    }
+    lastX = x; lastY = y;
+}
+
+
+function Draw4(x, y, isDown) {
+    if (isDown) {
+        ctx4.beginPath();
+        ctx4.strokeStyle = $('#selColor').val();
+        ctx4.lineWidth = $('#selWidth').val();
+        ctx4.lineJoin = "round";
+        ctx4.moveTo(lastX, lastY);
+        ctx4.lineTo(x, y);
+        ctx4.closePath();
+        ctx4.stroke();
+    }
+    lastX = x; lastY = y;
+}
+	
+function clearArea() {
+    // Use the identity matrix while clearing the canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  
+    // clear ctx2
+   ctx2.setTransform(1, 0, 0, 1, 0, 0);
+    ctx2.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  
+      // clear ctx3
+   ctx3.setTransform(1, 0, 0, 1, 0, 0);
+    ctx3.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  // clear ctx4
+  
+   ctx4.setTransform(1, 0, 0, 1, 0, 0);
+    ctx4.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+
+}
+
+
+
+function array() {
+ 
+  
+   document.getElementById('opening_bracket').innerHTML = "["
+  
+   var imageData = ctx.getImageData(0, 0, 80, 80);
+  
+   var data = imageData.data;
+  
+    for (var i = 0; i < data.length; i += 4) {
+      
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+      // ctx.putImageData(imageData, 0, 0);
+  };
+    
+   // logs an array of 10 x 10 x 4 (400 items)
+   //document.write(data);
+   
+  var gray = [];
+  
+  for (var x = 0; x < data.length; x +=4 ) {
+      gray.push(data[x]);
+  };
+  
+  // document.write(gray)
+  // 122, 122, 124, 0,   121, 122, 122, 122,   
+  //document.write(gray.length)
+  // 6400
+  
+  
+  var first_digit = [];
+  for (var y = 0; y < data.length; y+=4) {
+    first_digit.push(data[y])
+  }
+ 
+ 
+ //document.write(first_digit)
+ //document.write(first_digit.length)
+ // 6400
+  
+ var compress = []
+ var counter = 0;
+ var sum = 0;
+ var ten = 0;
+ 
+ for (var z = 0; z < first_digit.length; z++) {
+   
+   sum = sum + first_digit[z];
+   
+   if (z % 100 === 0) {
+     compress.push(sum/100);
+     sum = 0;   
+   }
+       
+ };
+
+  function average(list){
+ averageVal = 0
+ for(var i = 0; i < list.length; i++){
+   averageVal = averageVal + list[i]/list.length
+ }
+ return averageVal
+}
+
+squares = []
+for(var i = 0; i < 64; i++){
+ squares.push([]);
+
+}
+
+for(var y = 0; y < 80; y++) {
+
+  for(var x = 0; x < 80; x++) {
+    
+    squares[parseInt(y/10) * 8 + parseInt(x/10)].push(first_digit[x + y * 80])
+ 
+  }
+  
+}
+
+compressed = []
+
+squares.forEach(function(square){
+ compressed.push(average(square)/16)
+})
+
+//document.write(compressed)
+  
+  // round
+for (var k = 0; k < compress.length; k++) {
+  compressed[k] = compressed[k].toFixed(2);
+}
+  
+  
+  document.getElementById('display').innerHTML = "[" + compressed + "]" + ","
+  
+  
+  
+  
+  
+  
+  
+  // part 2
+   var imageData = ctx2.getImageData(0, 0, 80, 80);
+  
+   var data = imageData.data;
+  
+    for (var i = 0; i < data.length; i += 4) {
+      
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+      // ctx.putImageData(imageData, 0, 0);
+  };
+    
+   // logs an array of 10 x 10 x 4 (400 items)
+   //document.write(data);
+   
+  var gray = [];
+  
+  for (var x = 0; x < data.length; x +=4 ) {
+      gray.push(data[x]);
+  };
+  
+  // document.write(gray)
+  // 122, 122, 124, 0,   121, 122, 122, 122,   
+  //document.write(gray.length)
+  // 6400
+  
+  
+  var first_digit = [];
+  for (var y = 0; y < data.length; y+=4) {
+    first_digit.push(data[y])
+  }
+ 
+ 
+ //document.write(first_digit)
+ //document.write(first_digit.length)
+ // 6400
+  
+ var compress = []
+ var counter = 0;
+ var sum = 0;
+ var ten = 0;
+ 
+ for (var z = 0; z < first_digit.length; z++) {
+   
+   sum = sum + first_digit[z];
+   
+   if (z % 100 === 0) {
+     compress.push(sum/100);
+     sum = 0;   
+   }
+       
+ };
+
+  function average(list){
+ averageVal = 0
+ for(var i = 0; i < list.length; i++){
+   averageVal = averageVal + list[i]/list.length
+ }
+ return averageVal
+}
+
+squares = []
+for(var i = 0; i < 64; i++){
+ squares.push([]);
+
+}
+
+for(var y = 0; y < 80; y++) {
+
+  for(var x = 0; x < 80; x++) {
+    
+    squares[parseInt(y/10) * 8 + parseInt(x/10)].push(first_digit[x + y * 80])
+ 
+  }
+  
+}
+
+compressed = []
+
+squares.forEach(function(square){
+ compressed.push(average(square)/16)
+})
+
+//document.write(compressed)
+  
+// round
+for (var k = 0; k < compress.length; k++) {
+  compressed[k] = compressed[k].toFixed(2);
+}
+  
+
+
+  document.getElementById('display2').innerHTML = "[" + compressed + "]" + ","
+  
+  
+  
+  
+  
+  // =============== part 3
+  
+  var imageData = ctx3.getImageData(0, 0, 80, 80);
+  
+   var data = imageData.data;
+  
+    for (var i = 0; i < data.length; i += 4) {
+      
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+      // ctx.putImageData(imageData, 0, 0);
+  };
+    
+   // logs an array of 10 x 10 x 4 (400 items)
+   //document.write(data);
+   
+  var gray = [];
+  
+  for (var x = 0; x < data.length; x +=4 ) {
+      gray.push(data[x]);
+  };
+  
+  // document.write(gray)
+  // 122, 122, 124, 0,   121, 122, 122, 122,   
+  //document.write(gray.length)
+  // 6400
+  
+  
+  var first_digit = [];
+  for (var y = 0; y < data.length; y+=4) {
+    first_digit.push(data[y])
+  }
+ 
+ 
+ //document.write(first_digit)
+ //document.write(first_digit.length)
+ // 6400
+  
+ var compress = []
+ var counter = 0;
+ var sum = 0;
+ var ten = 0;
+ 
+ for (var z = 0; z < first_digit.length; z++) {
+   
+   sum = sum + first_digit[z];
+   
+   if (z % 100 === 0) {
+     compress.push(sum/100);
+     sum = 0;   
+   }
+       
+ };
+
+  function average(list){
+ averageVal = 0
+ for(var i = 0; i < list.length; i++){
+   averageVal = averageVal + list[i]/list.length
+ }
+ return averageVal
+}
+
+squares = []
+for(var i = 0; i < 64; i++){
+ squares.push([]);
+
+}
+
+for(var y = 0; y < 80; y++) {
+
+  for(var x = 0; x < 80; x++) {
+    
+    squares[parseInt(y/10) * 8 + parseInt(x/10)].push(first_digit[x + y * 80])
+ 
+  }
+  
+}
+
+compressed = []
+
+squares.forEach(function(square){
+ compressed.push(average(square)/16)
+})
+
+//document.write(compressed)
+  
+// round
+for (var k = 0; k < compress.length; k++) {
+  compressed[k] = compressed[k].toFixed(2);
+}
+  
+  document.getElementById('display3').innerHTML = "[" + compressed + "]" + ","
+  
+  
+  
+  
+  
+  
+  
+  // =========== 4
+  var imageData = ctx4.getImageData(0, 0, 80, 80);
+  
+   var data = imageData.data;
+  
+    for (var i = 0; i < data.length; i += 4) {
+      
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+      // ctx.putImageData(imageData, 0, 0);
+  };
+    
+   // logs an array of 10 x 10 x 4 (400 items)
+   //document.write(data);
+   
+  var gray = [];
+  
+  for (var x = 0; x < data.length; x +=4 ) {
+      gray.push(data[x]);
+  };
+  
+  // document.write(gray)
+  // 122, 122, 124, 0,   121, 122, 122, 122,   
+  //document.write(gray.length)
+  // 6400
+  
+  
+  var first_digit = [];
+  for (var y = 0; y < data.length; y+=4) {
+    first_digit.push(data[y])
+  }
+ 
+ 
+ //document.write(first_digit)
+ //document.write(first_digit.length)
+ // 6400
+  
+ var compress = []
+ var counter = 0;
+ var sum = 0;
+ var ten = 0;
+ 
+ for (var z = 0; z < first_digit.length; z++) {
+   
+   sum = sum + first_digit[z];
+   
+   if (z % 100 === 0) {
+     compress.push(sum/100);
+     sum = 0;   
+   }
+       
+ };
+
+  function average(list){
+ averageVal = 0
+ for(var i = 0; i < list.length; i++){
+   averageVal = averageVal + list[i]/list.length
+ }
+ return averageVal
+}
+
+squares = []
+for(var i = 0; i < 64; i++){
+ squares.push([]);
+
+}
+
+for(var y = 0; y < 80; y++) {
+
+  for(var x = 0; x < 80; x++) {
+    
+    squares[parseInt(y/10) * 8 + parseInt(x/10)].push(first_digit[x + y * 80])
+ 
+  }
+  
+}
+
+compressed = []
+
+squares.forEach(function(square){
+ compressed.push(average(square)/16)
+})
+
+// round
+for (var k = 0; k < compress.length; k++) {
+  compressed[k] = compressed[k].toFixed(2);
+}
+  
+//document.write(compressed)
+  
+  
+  document.getElementById('display4').innerHTML = "[" + compressed + "]"
+  
+  document.getElementById('closing_bracket').innerHTML = "]"
+
+}
+
+
+
+
+
+
+
+
+
 
 #-----------------------------------------------
 
@@ -24475,6 +25975,24 @@ df = pd.DataFrame([
 		[34, 28, 51],
 		],
 		columns = ['name', 'address', 'column'])
+	
+	
+import pandas as pd
+data = [['Alex',10],['Bob',12],['Clarke',13]]
+df = pd.DataFrame(data,columns=['Name','Age'])
+print df
+#Its output is as follows −
+'''
+      Name      Age
+0     Alex      10
+1     Bob       12
+2     Clarke    13
+'''
+
+flag_to_check = pd.DataFrame ([[1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]], 
+columns =  ['Red', 'Green', 'Blue', 'Gold', 'White', 'Black', 'Orange','Circles','Crosses', 'Saltires', 'Quarters', 'Sunstars', 'Crescent', 'Triangle'])
+
+
 		
 #use dictionary to create dataframe
 data = {'col_1': [3, 2, 1, 0], 'col_2': ['a', 'b', 'c', 'd']}	
@@ -24491,6 +26009,11 @@ pd.DataFrame.from_dict(data, orient='index')
 #       0  1  2  3
 #row_1  3  2  1  0
 #row_2  a  b  c  d
+
+
+
+
+
 
 # select certain column
 
@@ -24522,6 +26045,22 @@ df.iloc[2:3]
 df.iloc[:4]
 df.iloc[-2]
 df.iloc[[1,3,5]]
+
+#return value of a cell
+
+In [3]: sub_df
+Out[3]:
+          A         B
+2 -0.133653 -0.030854
+
+In [4]: sub_df.iloc[0]
+Out[4]:
+A   -0.133653
+B   -0.030854
+Name: 2, dtype: float64
+
+In [5]: sub_df.iloc[0]['A']
+Out[5]: -0.13365288513107493
 
 #select with logic
 
@@ -24605,7 +26144,10 @@ new_df = pd.merge(df1, df2)
 new_df = df.merge(df1).merge(df3)
 
 #concate
-menu = pd.concate([df1], [df2])
+menu = pd.concate([df1], [df2]) # zhe ge you cuowu
+
+#concat and re index
+pd.concat([s1, s2], ignore_index=True)
 
 #merge left / right
 how = left
@@ -24635,9 +26177,9 @@ pd.merge(orders, customers.rename(columns = {'id' : 'customer'}))
 
 
 
+# rearrange column sequence 
 
-
-
+df = df[['x', 'y', 'a', 'b']]
 
 
 
@@ -31107,7 +32649,7 @@ score_mean_2 = students.score.mean()
 print(score_mean, score_mean_2)
 
 
-#-------------- project ------------------
+#-------------- project ------------------ 
 
 import pandas as pd
 import numpy as np
@@ -31174,7 +32716,844 @@ plt.show()
 https://www.kaggle.com/datasets
 
 
+#----------------PROJECT PORJECT PROJECT DATA ANALYSIS CAPSTONE PROJECTS ---------------------
 
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Capstone 2: Biodiversity Project
+
+# # Introduction
+# You are a biodiversity analyst working for the National Parks Service.  You're going to help them analyze some data about species at various national parks.
+# 
+# Note: The data that you'll be working with for this project is *inspired* by real data, but is mostly fictional.
+
+# # Step 1
+# Import the modules that you'll be using in this assignment:
+# - `from matplotlib import pyplot as plt`
+# - `import pandas as pd`
+
+# In[1]:
+
+
+from matplotlib import pyplot as plt
+import pandas as pd
+
+
+# # Step 2
+# You have been given two CSV files. `species_info.csv` with data about different species in our National Parks, including:
+# - The scientific name of each species
+# - The common names of each species
+# - The species conservation status
+# 
+# Load the dataset and inspect it:
+# - Load `species_info.csv` into a DataFrame called `species`
+
+# In[2]:
+
+
+species = pd.read_csv('species_info.csv')
+
+
+# Inspect each DataFrame using `.head()`.
+
+# In[3]:
+
+
+species.head()
+
+
+# # Step 3
+# Let's start by learning a bit more about our data.  Answer each of the following questions.
+
+# How many different species are in the `species` DataFrame?
+
+# In[4]:
+
+
+species.scientific_name.nunique()
+
+
+# What are the different values of `category` in `species`?
+
+# In[5]:
+
+
+species.category.unique()
+
+
+# What are the different values of `conservation_status`?
+
+# In[6]:
+
+
+species.conservation_status.unique()
+
+
+# # Step 4
+# Let's start doing some analysis!
+# 
+# The column `conservation_status` has several possible values:
+# - `Species of Concern`: declining or appear to be in need of conservation
+# - `Threatened`: vulnerable to endangerment in the near future
+# - `Endangered`: seriously at risk of extinction
+# - `In Recovery`: formerly `Endangered`, but currnetly neither in danger of extinction throughout all or a significant portion of its range
+# 
+# We'd like to count up how many species meet each of these criteria.  Use `groupby` to count how many `scientific_name` meet each of these criteria.
+
+# In[7]:
+
+
+species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+# As we saw before, there are far more than 200 species in the `species` table.  Clearly, only a small number of them are categorized as needing some sort of protection.  The rest have `conservation_status` equal to `None`.  Because `groupby` does not include `None`, we will need to fill in the null values.  We can do this using `.fillna`.  We pass in however we want to fill in our `None` values as an argument.
+# 
+# Paste the following code and run it to see replace `None` with `No Intervention`:
+# ```python
+# species.fillna('No Intervention', inplace=True)
+# ```
+
+# In[8]:
+
+
+species.fillna('No Intervention', inplace=True)
+
+
+# Great! Now run the same `groupby` as before to see how many species require `No Protection`.
+
+# In[9]:
+
+
+species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+# Let's use `plt.bar` to create a bar chart.  First, let's sort the columns by how many species are in each categories.  We can do this using `.sort_values`.  We use the the keyword `by` to indicate which column we want to sort by.
+# 
+# Paste the following code and run it to create a new DataFrame called `protection_counts`, which is sorted by `scientific_name`:
+# ```python
+# protection_counts = species.groupby('conservation_status')\
+#     .scientific_name.nunique().reset_index()\
+#     .sort_values(by='scientific_name')
+# ```
+
+# In[11]:
+
+
+protection_counts = species.groupby('conservation_status')    .scientific_name.nunique().reset_index()    .sort_values(by='scientific_name')
+
+
+# Now let's create a bar chart!
+# 1. Start by creating a wide figure with `figsize=(10, 4)`
+# 1. Start by creating an axes object called `ax` using `plt.subplot`.
+# 2. Create a bar chart whose heights are equal to `scientific_name` column of `protection_counts`.
+# 3. Create an x-tick for each of the bars.
+# 4. Label each x-tick with the label from `conservation_status` in `protection_counts`
+# 5. Label the y-axis `Number of Species`
+# 6. Title the graph `Conservation Status by Species`
+# 7. Plot the grap using `plt.show()`
+
+# In[12]:
+
+
+plt.figure(figsize=(10, 4))
+ax = plt.subplot()
+plt.bar(range(len(protection_counts)),
+        protection_counts.scientific_name.values)
+ax.set_xticks(range(len(protection_counts)))
+ax.set_xticklabels(protection_counts.conservation_status.values)
+plt.ylabel('Number of Species')
+plt.title('Conservation Status by Species')
+plt.show()
+
+
+# # Step 4
+# Are certain types of species more likely to be endangered?
+
+# Let's create a new column in `species` called `is_protected`, which is `True` if `conservation_status` is not equal to `No Intervention`, and `False` otherwise.
+
+# In[13]:
+
+
+species['is_protected'] = species.conservation_status != 'No Intervention'
+
+
+# Let's group the `species` data frame by the `category` and `is_protected` columns and count the unique `scientific_name`s in each grouping.
+# 
+# Save your results to `category_counts`.
+
+# In[14]:
+
+
+category_counts = species.groupby(['category', 'is_protected'])                         .scientific_name.nunique().reset_index()
+
+
+# Examine `category_counts` using `head()`.
+
+# In[15]:
+
+
+category_counts.head()
+
+
+# It's going to be easier to view this data if we pivot it.  Using `pivot`, rearange `category_counts` so that:
+# - `columns` is `is_protected`
+# - `index` is `category`
+# - `values` is `scientific_name`
+# 
+# Save your pivoted data to `category_pivot`. Remember to `reset_index()` at the end.
+
+# In[16]:
+
+
+category_pivot = category_counts.pivot(columns='is_protected',
+                                      index='category',
+                                      values='scientific_name')\
+                                .reset_index()
+
+
+# Examine `category_pivot`.
+
+# In[17]:
+
+
+category_pivot
+
+
+# Use the `.columns` property to  rename the categories `True` and `False` to something more description:
+# - Leave `category` as `category`
+# - Rename `False` to `not_protected`
+# - Rename `True` to `protected`
+
+# In[18]:
+
+
+category_pivot.columns = ['category', 'not_protected', 'protected']
+
+
+# Let's create a new column of `category_pivot` called `percent_protected`, which is equal to `protected` (the number of species that are protected) divided by `protected` plus `not_protected` (the total number of species).
+
+# In[19]:
+
+
+category_pivot['percent_protected'] = category_pivot.protected /                                       (category_pivot.protected + category_pivot.not_protected)
+
+
+# Examine `category_pivot`.
+
+# In[20]:
+
+
+category_pivot
+
+
+# It looks like species in category `Mammal` are more likely to be endangered than species in `Bird`.  We're going to do a significance test to see if this statement is true.  Before you do the significance test, consider the following questions:
+# - Is the data numerical or categorical?
+# - How many pieces of data are you comparing?
+
+# Based on those answers, you should choose to do a *chi squared test*.  In order to run a chi squared test, we'll need to create a contingency table.  Our contingency table should look like this:
+# 
+# ||protected|not protected|
+# |-|-|-|
+# |Mammal|?|?|
+# |Bird|?|?|
+# 
+# Create a table called `contingency` and fill it in with the correct numbers
+
+# In[21]:
+
+
+contingency = [[30, 146],
+              [75, 413]]
+
+
+# In order to perform our chi square test, we'll need to import the correct function from scipy.  Past the following code and run it:
+# ```py
+# from scipy.stats import chi2_contingency
+# ```
+
+# In[22]:
+
+
+from scipy.stats import chi2_contingency
+
+
+# Now run `chi2_contingency` with `contingency`.
+
+# In[23]:
+
+
+chi2_contingency(contingency)
+
+
+# It looks like this difference isn't significant!
+# 
+# Let's test another.  Is the difference between `Reptile` and `Mammal` significant?
+
+# In[24]:
+
+
+contingency = [[30, 146],
+               [5, 73]]
+chi2_contingency(contingency)
+
+
+# Yes! It looks like there is a significant difference between `Reptile` and `Mammal`!
+
+# # Step 5
+
+# Conservationists have been recording sightings of different species at several national parks for the past 7 days.  They've saved sent you their observations in a file called `observations.csv`.  Load `observations.csv` into a variable called `observations`, then use `head` to view the data.
+
+# In[25]:
+
+
+observations = pd.read_csv('observations.csv')
+observations.head()
+
+
+# Some scientists are studying the number of sheep sightings at different national parks.  There are several different scientific names for different types of sheep.  We'd like to know which rows of `species` are referring to sheep.  Notice that the following code will tell us whether or not a word occurs in a string:
+
+# In[26]:
+
+
+# Does "Sheep" occur in this string?
+str1 = 'This string contains Sheep'
+'Sheep' in str1
+
+
+# In[27]:
+
+
+# Does "Sheep" occur in this string?
+str2 = 'This string contains Cows'
+'Sheep' in str2
+
+
+# Use `apply` and a `lambda` function to create a new column in `species` called `is_sheep` which is `True` if the `common_names` contains `'Sheep'`, and `False` otherwise.
+
+# In[28]:
+
+
+species['is_sheep'] = species.common_names.apply(lambda x: 'Sheep' in x)
+species.head()
+
+
+# Select the rows of `species` where `is_sheep` is `True` and examine the results.
+
+# In[29]:
+
+
+species[species.is_sheep]
+
+
+# Many of the results are actually plants.  Select the rows of `species` where `is_sheep` is `True` and `category` is `Mammal`.  Save the results to the variable `sheep_species`.
+
+# In[30]:
+
+
+sheep_species = species[(species.is_sheep) & (species.category == 'Mammal')]
+sheep_species
+
+
+# Now merge `sheep_species` with `observations` to get a DataFrame with observations of sheep.  Save this DataFrame as `sheep_observations`.
+
+# In[31]:
+
+
+sheep_observations = observations.merge(sheep_species)
+sheep_observations
+
+
+# How many total sheep observations (across all three species) were made at each national park?  Use `groupby` to get the `sum` of `observations` for each `park_name`.  Save your answer to `obs_by_park`.
+# 
+# This is the total number of sheep observed in each park over the past 7 days.
+
+# In[32]:
+
+
+obs_by_park = sheep_observations.groupby('park_name').observations.sum().reset_index()
+obs_by_park
+
+
+# Create a bar chart showing the different number of observations per week at each park.
+# 
+# 1. Start by creating a wide figure with `figsize=(16, 4)`
+# 1. Start by creating an axes object called `ax` using `plt.subplot`.
+# 2. Create a bar chart whose heights are equal to `observations` column of `obs_by_park`.
+# 3. Create an x-tick for each of the bars.
+# 4. Label each x-tick with the label from `park_name` in `obs_by_park`
+# 5. Label the y-axis `Number of Observations`
+# 6. Title the graph `Observations of Sheep per Week`
+# 7. Plot the grap using `plt.show()`
+
+# In[33]:
+
+
+plt.figure(figsize=(16, 4))
+ax = plt.subplot()
+plt.bar(range(len(obs_by_park)),
+        obs_by_park.observations.values)
+ax.set_xticks(range(len(obs_by_park)))
+ax.set_xticklabels(obs_by_park.park_name.values)
+plt.ylabel('Number of Observations')
+plt.title('Observations of Sheep per Week')
+plt.show()
+
+
+# Our scientists know that 15% of sheep at Bryce National Park have foot and mouth disease.  Park rangers at Yellowstone National Park have been running a program to reduce the rate of foot and mouth disease at that park.  The scientists want to test whether or not this program is working.  They want to be able to detect reductions of at least 5 percentage point.  For instance, if 10% of sheep in Yellowstone have foot and mouth disease, they'd like to be able to know this, with confidence.
+# 
+# Use the <a href="https://s3.amazonaws.com/codecademy-content/courses/learn-hypothesis-testing/a_b_sample_size/index.html">Codecademy sample size calculator</a> to calculate the number of sheep that they would need to observe from each park.  Use the default level of significance (90%).
+# 
+# Remember that "Minimum Detectable Effect" is a percent of the baseline.
+
+# In[1]:
+
+
+minimum_detectable_effect = 100 * 0.05 / 0.15
+minimum_detectable_effect
+
+
+# In[2]:
+
+
+baseline = 15
+
+
+# In[4]:
+
+
+sample_size_per_variant = 870
+# Note: This could be 890 if you used 33% for the "Minimum Detectable Effect" instead of 33.33%.  That's fine.
+
+
+# How many weeks would you need to observe sheep at Bryce National Park in order to observe enough sheep?  How many weeks would you need to observe at Yellowstone National Park to observe enough sheep?
+
+# In[7]:
+
+
+bryce = 870 / 250.
+yellowstone = 810 / 507.
+
+# Approximately 3.5 weeks at Bryce and 1.5 weeks at Yellowstone.
+
+
+# In[ ]:
+
+
+
+#----------------PROJECT PORJECT PROJECT DATA ANALYSIS CAPSTONE PROJECTS ---------------------
+
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Capstone Project 1: MuscleHub AB Test
+
+# ## Step 1: Get started with SQL
+
+# Like most businesses, Janet keeps her data in a SQL database.  Normally, you'd download the data from her database to a csv file, and then load it into a Jupyter Notebook using Pandas.
+# 
+# For this project, you'll have to access SQL in a slightly different way.  You'll be using a special Codecademy library that lets you type SQL queries directly into this Jupyter notebook.  You'll have pass each SQL query as an argument to a function called `sql_query`.  Each query will return a Pandas DataFrame.  Here's an example:
+
+# In[1]:
+
+
+# This import only needs to happen once, at the beginning of the notebook
+from codecademySQL import sql_query
+
+
+# In[2]:
+
+
+# Here's an example of a query that just displays some data
+sql_query('''
+SELECT *
+FROM visits
+LIMIT 5
+''')
+
+
+# In[3]:
+
+
+# Here's an example where we save the data to a DataFrame
+df = sql_query('''
+SELECT *
+FROM applications
+LIMIT 5
+''')
+
+
+# ## Step 2: Get your dataset
+
+# Let's get started!
+# 
+# Janet of MuscleHub has a SQLite database, which contains several tables that will be helpful to you in this investigation:
+# - `visits` contains information about potential gym customers who have visited MuscleHub
+# - `fitness_tests` contains information about potential customers in "Group A", who were given a fitness test
+# - `applications` contains information about any potential customers (both "Group A" and "Group B") who filled out an application.  Not everyone in `visits` will have filled out an application.
+# - `purchases` contains information about customers who purchased a membership to MuscleHub.
+# 
+# Use the space below to examine each table.
+
+# In[4]:
+
+
+# Examine visits here
+sql_query('''
+SELECT *
+FROM visits
+LIMIT 5
+''')
+
+
+# In[5]:
+
+
+# Examine fitness_tests here
+sql_query('''
+SELECT *
+FROM fitness_tests
+LIMIT 5
+''')
+
+
+# In[6]:
+
+
+# Examine applications here
+sql_query('''
+SELECT *
+FROM applications
+LIMIT 5
+''')
+
+
+# In[7]:
+
+
+# Examine purchases here
+sql_query('''
+SELECT *
+FROM purchases
+LIMIT 5
+''')
+
+
+# We'd like to download a giant DataFrame containing all of this data.  You'll need to write a query that does the following things:
+# 
+# 1. Not all visits in  `visits` occurred during the A/B test.  You'll only want to pull data where `visit_date` is on or after `7-1-17`.
+# 
+# 2. You'll want to perform a series of `LEFT JOIN` commands to combine the four tables that we care about.  You'll need to perform the joins on `first_name`, `last_name`, and `email`.  Pull the following columns:
+# 
+# 
+# - `visits.first_name`
+# - `visits.last_name`
+# - `visits.gender`
+# - `visits.email`
+# - `visits.visit_date`
+# - `fitness_tests.fitness_test_date`
+# - `applications.application_date`
+# - `purchases.purchase_date`
+# 
+# Save the result of this query to a variable called `df`.
+# 
+# Hint: your result should have 5004 rows.  Does it?
+
+# In[8]:
+
+
+df = sql_query('''
+SELECT visits.first_name,
+       visits.last_name,
+       visits.visit_date,
+       fitness_tests.fitness_test_date,
+       applications.application_date,
+       purchases.purchase_date
+FROM visits
+LEFT JOIN fitness_tests
+    ON fitness_tests.first_name = visits.first_name
+    AND fitness_tests.last_name = visits.last_name
+    AND fitness_tests.email = visits.email
+LEFT JOIN applications
+    ON applications.first_name = visits.first_name
+    AND applications.last_name = visits.last_name
+    AND applications.email = visits.email
+LEFT JOIN purchases
+    ON purchases.first_name = visits.first_name
+    AND purchases.last_name = visits.last_name
+    AND purchases.email = visits.email
+WHERE visits.visit_date >= '7-1-17'
+''')
+
+
+# ## Step 3: Investigate the A and B groups
+
+# We have some data to work with! Import the following modules so that we can start doing analysis:
+# - `import pandas as pd`
+# - `from matplotlib import pyplot as plt`
+
+# In[9]:
+
+
+import pandas as pd
+from matplotlib import pyplot as plt
+
+
+# We're going to add some columns to `df` to help us with our analysis.
+# 
+# Start by adding a column called `ab_test_group`.  It should be `A` if `fitness_test_date` is not `None`, and `B` if `fitness_test_date` is `None`.
+
+# In[10]:
+
+
+df['ab_test_group'] = df.fitness_test_date.apply(lambda x:
+                                                'A' if pd.notnull(x) else 'B')
+
+
+# Let's do a quick sanity check that Janet split her visitors such that about half are in A and half are in B.
+# 
+# Start by using `groupby` to count how many users are in each `ab_test_group`.  Save the results to `ab_counts`.
+
+# In[11]:
+
+
+ab_counts = df.groupby('ab_test_group').first_name.count().reset_index()
+ab_counts
+
+
+# We'll want to include this information in our presentation.  Let's create a pie cart using `plt.pie`.  Make sure to include:
+# - Use `plt.axis('equal')` so that your pie chart looks nice
+# - Add a legend labeling `A` and `B`
+# - Use `autopct` to label the percentage of each group
+# - Save your figure as `ab_test_pie_chart.png`
+
+# In[12]:
+
+
+plt.pie(ab_counts.first_name.values, labels=['A', 'B'], autopct='%0.2f%%')
+plt.axis('equal')
+plt.show()
+plt.savefig('ab_test_pie_chart.png')
+
+
+# ## Step 4: Who picks up an application?
+
+# Recall that the sign-up process for MuscleHub has several steps:
+# 1. Take a fitness test with a personal trainer (only Group A)
+# 2. Fill out an application for the gym
+# 3. Send in their payment for their first month's membership
+# 
+# Let's examine how many people make it to Step 2, filling out an application.
+# 
+# Start by creating a new column in `df` called `is_application` which is `Application` if `application_date` is not `None` and `No Application`, otherwise.
+
+# In[13]:
+
+
+df['is_application'] = df.application_date.apply(lambda x: 'Application'
+                                                  if pd.notnull(x) else 'No Application')
+
+
+# Now, using `groupby`, count how many people from Group A and Group B either do or don't pick up an application.  You'll want to group by `ab_test_group` and `is_application`.  Save this new DataFrame as `app_counts`
+
+# In[14]:
+
+
+app_counts = df.groupby(['ab_test_group', 'is_application'])               .first_name.count().reset_index()
+
+
+# We're going to want to calculate the percent of people in each group who complete an application.  It's going to be much easier to do this if we pivot `app_counts` such that:
+# - The `index` is `ab_test_group`
+# - The `columns` are `is_application`
+# Perform this pivot and save it to the variable `app_pivot`.  Remember to call `reset_index()` at the end of the pivot!
+
+# In[15]:
+
+
+app_pivot = app_counts.pivot(columns='is_application',
+                            index='ab_test_group',
+                            values='first_name')\
+            .reset_index()
+app_pivot
+
+
+# Define a new column called `Total`, which is the sum of `Application` and `No Application`.
+
+# In[16]:
+
+
+app_pivot['Total'] = app_pivot.Application + app_pivot['No Application']
+
+
+# Calculate another column called `Percent with Application`, which is equal to `Application` divided by `Total`.
+
+# In[17]:
+
+
+app_pivot['Percent with Application'] = app_pivot.Application / app_pivot.Total
+app_pivot
+
+
+# It looks like more people from Group B turned in an application.  Why might that be?
+# 
+# We need to know if this difference is statistically significant.
+# 
+# Choose a hypothesis tests, import it from `scipy` and perform it.  Be sure to note the p-value.
+# Is this result significant?
+
+# In[18]:
+
+
+from scipy.stats import chi2_contingency
+
+contingency = [[250, 2254], [325, 2175]]
+chi2_contingency(contingency)
+
+
+# ## Step 4: Who purchases a membership?
+
+# Of those who picked up an application, how many purchased a membership?
+# 
+# Let's begin by adding a column to `df` called `is_member` which is `Member` if `purchase_date` is not `None`, and `Not Member` otherwise.
+
+# In[19]:
+
+
+df['is_member'] = df.purchase_date.apply(lambda x: 'Member' if pd.notnull(x) else 'Not Member')
+
+
+# Now, let's create a DataFrame called `just_apps` the contains only people who picked up an application.
+
+# In[20]:
+
+
+just_apps = df[df.is_application == 'Application']
+
+
+# Great! Now, let's do a `groupby` to find out how many people in `just_apps` are and aren't members from each group.  Follow the same process that we did in Step 4, including pivoting the data.  You should end up with a DataFrame that looks like this:
+# 
+# |is_member|ab_test_group|Member|Not Member|Total|Percent Purchase|
+# |-|-|-|-|-|-|
+# |0|A|?|?|?|?|
+# |1|B|?|?|?|?|
+# 
+# Save your final DataFrame as `member_pivot`.
+
+# In[21]:
+
+
+member_count = just_apps.groupby(['ab_test_group', 'is_member'])                 .first_name.count().reset_index()
+member_pivot = member_count.pivot(columns='is_member',
+                                  index='ab_test_group',
+                                  values='first_name')\
+                           .reset_index()
+
+member_pivot['Total'] = member_pivot.Member + member_pivot['Not Member']
+member_pivot['Percent Purchase'] = member_pivot.Member / member_pivot.Total
+member_pivot
+
+
+# It looks like people who took the fitness test were more likely to purchase a membership **if** they picked up an application.  Why might that be?
+# 
+# Just like before, we need to know if this difference is statistically significant.  Choose a hypothesis tests, import it from `scipy` and perform it.  Be sure to note the p-value.
+# Is this result significant?
+
+# In[22]:
+
+
+contingency = [[200, 50], [250, 75]]
+chi2_contingency(contingency)
+
+
+# Previously, we looked at what percent of people **who picked up applications** purchased memberships.  What we really care about is what percentage of **all visitors** purchased memberships.  Return to `df` and do a `groupby` to find out how many people in `df` are and aren't members from each group.  Follow the same process that we did in Step 4, including pivoting the data.  You should end up with a DataFrame that looks like this:
+# 
+# |is_member|ab_test_group|Member|Not Member|Total|Percent Purchase|
+# |-|-|-|-|-|-|
+# |0|A|?|?|?|?|
+# |1|B|?|?|?|?|
+# 
+# Save your final DataFrame as `final_member_pivot`.
+
+# In[23]:
+
+
+final_member_count = df.groupby(['ab_test_group', 'is_member'])                 .first_name.count().reset_index()
+final_member_pivot = final_member_count.pivot(columns='is_member',
+                                  index='ab_test_group',
+                                  values='first_name')\
+                           .reset_index()
+
+final_member_pivot['Total'] = final_member_pivot.Member + final_member_pivot['Not Member']
+final_member_pivot['Percent Purchase'] = final_member_pivot.Member / final_member_pivot.Total
+final_member_pivot
+
+
+# Previously, when we only considered people who had **already picked up an application**, we saw that there was no significant difference in membership between Group A and Group B.
+# 
+# Now, when we consider all people who **visit MuscleHub**, we see that there might be a significant different in memberships between Group A and Group B.  Perform a significance test and check.
+
+# In[24]:
+
+
+contingency = [[200, 2304], [250, 2250]]
+chi2_contingency(contingency)
+
+
+# ## Step 5: Summarize the acquisition funel with a chart
+
+# We'd like to make a bar chart for Janet that shows the difference between Group A (people who were given the fitness test) and Group B (people who were not given the fitness test) at each state of the process:
+# - Percent of visitors who apply
+# - Percent of applicants who purchase a membership
+# - Percent of visitors who purchase a membership
+# 
+# Create one plot for **each** of the three sets of percentages that you calculated in `app_pivot`, `member_pivot` and `final_member_pivot`.  Each plot should:
+# - Label the two bars as `Fitness Test` and `No Fitness Test`
+# - Make sure that the y-axis ticks are expressed as percents (i.e., `5%`)
+# - Have a title
+
+# In[25]:
+
+
+# Percent of Visitors who Apply
+ax = plt.subplot()
+plt.bar(range(len(app_pivot)),
+       app_pivot['Percent with Application'].values)
+ax.set_xticks(range(len(app_pivot)))
+ax.set_xticklabels(['Fitness Test', 'No Fitness Test'])
+ax.set_yticks([0, 0.05, 0.10, 0.15, 0.20])
+ax.set_yticklabels(['0%', '5%', '10%', '15%', '20%'])
+plt.show()
+plt.savefig('percent_visitors_apply.png')
+
+
+# In[26]:
+
+
+# Percent of Applicants who Purchase
+ax = plt.subplot()
+plt.bar(range(len(member_pivot)),
+       member_pivot['Percent Purchase'].values)
+ax.set_xticks(range(len(app_pivot)))
+ax.set_xticklabels(['Fitness Test', 'No Fitness Test'])
+ax.set_yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+ax.set_yticklabels(['0%', '10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'])
+plt.show()
+plt.savefig('percent_apply_purchase.png')
+
+
+# In[27]:
+
+
+# Percent of Visitors who Purchase
+ax = plt.subplot()
+plt.bar(range(len(final_member_pivot)),
+       final_member_pivot['Percent Purchase'].values)
+ax.set_xticks(range(len(app_pivot)))
+ax.set_xticklabels(['Fitness Test', 'No Fitness Test'])
+ax.set_yticks([0, 0.05, 0.10, 0.15, 0.20])
+ax.set_yticklabels(['0%', '5%', '10%', '15%', '20%'])
+plt.show()
+plt.savefig('percent_visitors_purchase.png')
 
 
 
@@ -31327,9 +33706,140 @@ git push origin <branch_name>#: Pushes a local branch to the origin remote.
 cd ../veggie-clone
 
 
+#git config
+
+git config --global user.name "xxx"
+git config --global user.email "xxx@gmail.com"
+
+git config --list
+
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#-#-#-#-#-#-#-NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME NAME#-#-#-#-#-#-#-#-#-
+#-#-#-#-#-#-#-Venv python Virtual enviroment Venv #-#-#-#-#-#-#-#-#-
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
+# in windows enviroment
+
+'''
+Why use Virtual Enviroment ?
+
+in virtual enviroment, the package is installed only for that specific job. 
+that prevent things happend like when you update your certain package, and old script not working. 
+
+if you use a single globe enviroment, when you update some package, it may borke some old project. 
+
+How to create:
+
+it come with python , any version higher than 3.3 is good. 
+
+'''
+
+pip list # check what package is installed
+
+python -m venv new_venv # create a new enviroment , -m means run a moudle
+
+new_venv\Scripts\activate.bat #activate enviroment
+
+where python # check if it is activated
+
+pip list 
+
+pip freeze # same as pip list but give in a correct form for txt file
+
+#export this to a txt file. (new_venv.txt)
+
+pip install packagename #anything install from now will be only for this venv
+
+new_venv\Scripts\deactivate.bat #deactivate current enviroment
+
+rmdir new_venv /s #delete the proejct and virtual enviroment
+
+mkdir Another_Project
+
+python -m venv Another_Project\venv #make a new venv for another proejct
+
+Another_Project\venv\Scripts\activate.bat # activate this enviroment
+
+pip install -r new_venv.txt # this will install all the listed package in the txt file
+
+pip list # we should see all the package is installed.  
+
+#now you can start to coding, all the code and resoures stay at root of Another_Project\ . but should not stay under venv.
+#the venv is a folder you can totally throw away and rebuild
+
+python -m venv third_venv --system-site-packages # this command will create a new v enviroment that have access to the globe packages 
+
+third_venv\scripts\activate.bat
+
+pip list # now you can see the globe package are included also here
+
+# after this env is activated, any package installed will only be for this project, globle package is not affected
+
+pip list --local # check local list
+
+pip freeze --local 
+
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-#-#-#-#-#-#- python Sys. #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
+import sys
+
+print(sys.version)
+print(sys.executable)
+
+# to find out where is python in windows
+
+# try 
+
+where python
+
+# or try
+
+python
+
+>>>import sys
+>>>sys.executable
+
+# this should find the address of python.
+
+
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-#-#-#-#-#-#- VS code . #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
+#short cut key
+
+#settings ctrl + `
+
+{
+    "files.maxMemoryForLargeFilesMB": 16384,
+    "editor.codeLens": false,
+    "workbench.iconTheme": "ayu",
+    // Determines which settings editor to use by default.
+    //  - ui: Use the settings UI editor.
+    //  - json: Use the JSON file editor.
+    "workbench.settings.editor": "json",
+    "workbench.settings.openDefaultSettings": true,
+    "workbench.startupEditor": "newUntitledFile",
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": false,
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.showExecutionMessage": false,
+    "code-runner.executorMap": {
+        "python": "$pythonPath -u $fullFileName"
+    }
+}
+
+#search anything
+#ctrl + shift + p 
+
+#code formating
+#alt + shift + f
+
+
+
 
 
 
