@@ -450,8 +450,8 @@ Set HTMLDoc = appIE.document
 
 
 'Fill in login info
-HTMLDoc.all.UserName.value = "16.Guan"
-HTMLDoc.all.PasswordView.value = "0p;/)P:?"
+HTMLDoc.all.UserName.value = "xxx"
+HTMLDoc.all.PasswordView.value = "xxx"
 HTMLDoc.all.LoginButton.Click
 
 'wair for IE to load the page
