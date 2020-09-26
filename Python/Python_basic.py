@@ -1,5 +1,18 @@
 
-    
+def intersect # retrun item in both list
+
+return [x for x in list1 if x in list2]
+
+
+lst.sort()    #sort original list
+
+new_lst = sorted(lst)   #return to a new list
+
+
+
+# print things on one line
+print(x, end='')
+
 	
 #----Function sample---------------------------------------------
 

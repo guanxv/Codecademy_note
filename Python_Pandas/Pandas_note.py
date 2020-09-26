@@ -181,6 +181,14 @@ tea_counts = tea_counts.rename(columns = {'id' : 'counts'})
 high_earners = df.groupby('category').wage.apply(lambda x: np.percentile(x, 75)).reset_index()
 df.groupby(['location', 'Day of week'])['Total cales'].mean().reset_index()
 
+df.groupby('animal').mean()
+
+df.groupby('animal').id.count().reset_index()
+
+
+
+
+
 #pivot table
 df.pivot(columns = 'column pivot',
 		inex = 'column to be row',
@@ -261,6 +269,312 @@ df.to_csv('ozito.csv')
 df1.to_excel("output.xlsx")
 
 df1.to_excel("output.xlsx", sheet_name='Sheet_name_1')
+
+
+
+
+# Dataframe general inquiry
+
+.head()                         #— display the first 5 rows of the table
+.info()                         #— display a summary of the table
+.describe()                     #— display the summary statistics of the table
+.columns                        #— display the column names of the table
+.column.value_counts()          #— display the distinct values for a column (did not count the nan)
+.column.value_counts()/len(df)  #-- display the percentage of each unique value
+passengers['Age'].values        #--- print all the values
+
+print(df.columns.unique())
+
+# df.xxx.nunique() -- how many type of items in  column xxx
+# df.xxx.unique() -- print all unique rows in xxx column
+
+
+
+# DataFrame Drop certain columns
+
+df = df[['col1', 'col3', 'col4']]
+
+# col2 is dropped
+
+
+
+# DataFrame drop duplicant
+
+series = students.duplicated()
+print(series.value_counts)
+print(series.unique())
+
+new_df = df.drop_duplicates() #drop only duplicated record
+
+fruits = fruits.drop_duplicates(subset=['item'])
+#will drop same fruits, no mater the price.
+
+
+
+# DataFrame Filter through certain row
+
+june = london_data.loc[london_data['month'] == 6]['TemperatureC']
+
+# select only 'TempratureC' column
+
+
+def findunitcost(knum, costmonth):
+    col = "UnitCost" + costmonth
+    return product_info.loc[product_info['Knum'] == knum][col].iloc[0]
+#retun the value rather than a DF.
+
+
+# DATAFRAME LAMBDA
+
+customer_amount = orders.groupby('customer_id').price.sum().reset_index()
+
+df['last_name'] = df.name.apply(lambda x: x.split(' ')[-1])
+
+species['is_protected'] = species.conservation_status.apply(lambda x: True if x != "No Intervention" else False )
+
+passengers['FirstClass'] = passengers.Pclass.apply(lambda x: 1 if x == 1 else 0)
+
+product_info['Product_Name_Check'] = product_info.apply(lambda row: 0 if row['Product_x'] == row['Product_y'] else 1, axis = 1)
+
+product_info['Product_y'] = product_info.apply(lambda row : row['Product_x'] if not isinstance(row['Product_y'], str) else row['Product_y'], axis = 1)
+
+cars["is_auto"] = cars.list_type.apply(lambda x: 1 if 'auto' in cars.name.str.lower() else 0)
+
+# DataFrame look at types
+
+print(df.dtypes)
+
+
+# item    price    calories
+# “banana”    “$1”    105
+# “apple”    “$0.75”    95
+
+# item        object  #object means it is a string in pd
+# price       object
+# calories     int64
+# dtype:        object
+
+
+
+# DataFrame Make new column based on sum of existing column
+
+df['Total Goals'] = df['Home Team Goals'] + df['Away Team Goals']
+
+df['proift'] = df['price'] - df['cost']
+
+# DataFrame select a sub Dataframe
+
+low_gdp = data[data['GDP'] <= median_gdp]
+
+# all the column will be kept using the condition of GDP < median
+
+
+# DataFrame Select Certain Column
+
+Temp = london_data['TemperatureC']
+
+
+# Dataframe Missing Values
+
+
+bill_df = bill_df.dropna() #drop all missing data
+
+bill_df = bill_df.dropna(subset=['num_guests']) #drop for certain column
+
+bill_df = bill_df.fillna(value={"bill":bill_df.bill.mean(), "num_guests":bill_df.num_guests.mean()})
+
+passengers['Age'].fillna(value = passengers.Age.mean(), inplace=True )
+
+#fill the missing num with mean()
+
+species.fillna('No Intervention', inplace=True)
+
+
+
+# DataFrame nunique()
+
+protection_counts = species.groupby('conservation_status')\
+    .scientific_name.nunique().reset_index()\
+    .sort_values(by='scientific_name')
+
+cuisine_options_count = restaurants.cuisine.nunique()      
+#nunique give you the num of the unique type directly.
+
+
+# DATAFRAME SUM
+
+customer_amount = orders.groupby('customer_id').price.sum().reset_index()
+
+
+
+# Dataframe pd.melt()
+
+students = pd.melt(frame=df, id_vars=['name','gender','grade'], value_vars=['fractions', 'probability'], value_name='score', var_name='exam')
+
+#['full_name', 'gender_age', 'fractions', 'probability', 'grade']
+
+#['full_name', 'gender_age', 'grade', 'exam', 'score']
+
+
+
+# DATAFRAME rename
+
+df.rename(columns = {
+        'old_name' : 'new_name',
+        'old_name2 : 'new_name2'
+})
+
+df = df.rename(columns = {'old_name' : 'new_name'})
+
+
+
+# Dataframe Sort
+
+df = df.sort_values(by=['col1', 'col2'], ascending= True)
+# first sory by col1, and then sort by col2
+# save to original df
+
+
+# DataFrame string
+
+students['gender'] = students.gender_age.str[0]
+students['age'] = students.gender_age.str[1:]
+
+# Create the 'month' column
+df['month'] = df.birthday.str[0:2]
+
+# Create the 'day' column
+df['day'] = df.birthday.str[2:4]
+
+# Create the 'year' column
+df['year'] = df.birthday.str[4:]
+
+# Create the 'str_split' column
+df['str_split'] = df.type.str.split('_')
+
+# Create the 'usertype' column
+df['usertype'] = df.str_split.str.get(0)
+
+# Create the 'country' column
+df['country'] = df.str_split.str.get(1)
+
+#this code will transfer this table 
+id    type
+1011    “user_Kenya”
+1112    “admin_US”
+1113    “moderator_UK”
+
+#to this
+id    type    country    usertype
+1011    “user_Kenya”    “Kenya”    “user”
+1112    “admin_US”    “US”    “admin”
+1113    “moderator_UK”    “UK”    “moderator”
+
+# OR
+
+name_split = students.full_name.str.split()
+
+students['first_name'] = name_split.str[0]
+students['last_name'] = name_split.str[1]
+
+#string sample 2
+
+fruit.price = fruit['price'].replace('[\$,]', '', regex=True)
+
+fruit.price = pd.to_numeric(fruit.price)
+
+# item    price    calories
+# “banana”    “$1”    105
+# “apple”    “$0.75”    95
+# “peach”    “$3”    55
+# “peach”    “$4”    55
+# “clementine”    “$2.5”    35
+
+# item    price    calories
+# “banana”    1    105
+# “apple”    0.75    95
+# “peach”    3    55
+# “peach”    4    55
+# “clementine”    2.5    35
+# Instructions
+
+#string sample 3
+
+# date    exerciseDescription
+# 10/18/2018    “lunges - 30 reps”
+# 10/18/2018    “squats - 20 reps”
+
+split_df = df['exerciseDescription'].str.split('(\d+)', expand=True)
+
+# * *    0    1    2
+# 0    “lunges - “    “30”    “reps”
+# 1    “squats - “    “20”    “reps”
+# 2    “deadlifts - “    “25”    “reps”
+
+df.reps = pd.to_numeric(split_df[1])
+df.exercise = split_df[2].replace('[\- ]', '', regex=True)
+
+# date    exerciseDescription    reps    exercise
+# 10/18/2018    “lunges - 30 reps”    30    “lunges”
+# 10/18/2018    “squats - 20 reps”    20    “squats”
+
+
+# df['column'] VS df['column'].values
+
+a = df['column']
+b = df['column'].values
+c = df.column.values.tolist()
+
+
+print(type(average_cost))  # <class 'pandas.core.series.Series'>
+print(type(cost))                 #<class 'numpy.ndarray'>
+print(type(c))                      # <class 'list>
+
+# Pandas add new column by spliting existing column
+
+date_split = orders.date.str.split('-')
+orders['month'] = date_split.str[0]
+
+# if you do :
+orders['month'] = orders.date.str.split('-')[0] 
+# you only get ['6', '18', '2017'], since it is the first item of all the dates in the list.
+
+
+
+
+
+# find mean and median with pandas dataframes
+
+df_mean = df['column'].mean()
+df_median = df['column'].median()
+
+median = np.median(data)
+
+# find min and max with pandas dataframes
+cp_data[' Average Covered Charges '].min()
+cp_data[' Average Covered Charges '].max()
+
+
+#pd.set_option display option
+
+
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+pd.set_option("display.max_colwidth", None)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

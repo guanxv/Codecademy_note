@@ -318,6 +318,12 @@ soup.find_all(has_banner_class_and_hello_world)
 
 <div class="banner">What's up, world!</div>
 
+# find a tag with certail attrs, but not sure about the value.
+
+car_script = soup.find("script", attrs={"class": True}) # will return script tags will attributis of class, nomater what's in the calss
+
+
+
 #-----------------------------------------------------------
 
 # WEB SCRAPING WITH BEAUTIFUL SOUP

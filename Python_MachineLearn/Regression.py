@@ -1,3 +1,37 @@
+
+# CATEGORICAL VARIABLES IN REGRESSION ANALYSIS 
+
+# reference https://stats.idre.ucla.edu/spss/faq/coding-systems-for-categorical-variables-in-regression-analysis-2/#:~:text=Categorical%20variables%20require%20special%20attention,entered%20into%20the%20regression%20model.
+
+# dummy coding
+
+#sample data 
+# RACE          Mean	  N
+# hispanic      46.4583	24
+# asian	        58.0000	11
+# african-amer	48.2000	20
+# white	        54.0552	145
+# Total	        52.7750	200
+
+# dummy coding new variable 
+
+# RACE          is_hispanic   is_asian    is_african-amer
+# hispanic      1             0           0 
+# asian	        0             1           0
+# african-amer	0             0           1
+# white	        0             0           0
+
+
+
+
+
+
+
+
+
+
+
+
 '''#Machine learning can be branched out into the following categories:
 #Supervised Learning
 #Unsupervised Learning

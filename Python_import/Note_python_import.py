@@ -1,3 +1,5 @@
+#check more info here https://docs.python.org/3/tutorial/modules.html
+
 import my_module
 
 course = ["History", "Math", "Physics", "CompSci"]
