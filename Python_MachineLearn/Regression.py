@@ -22,6 +22,13 @@
 # white	        0             0           0
 
 
+#sample code of making dummy coding 
+color_list = cars.colour.unique()
+
+for color in color_list:
+
+    cars["is_"+color] = cars.colour.apply(lambda x: 1 if x == color else 0)
+
 
 
 

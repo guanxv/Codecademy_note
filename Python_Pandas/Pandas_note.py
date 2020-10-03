@@ -340,6 +340,19 @@ product_info['Product_y'] = product_info.apply(lambda row : row['Product_x'] if 
 
 cars["is_auto"] = cars.list_type.apply(lambda x: 1 if 'auto' in cars.name.str.lower() else 0)
 
+cars["is_petrol"] = cars.fuelType.apply(lambda x: 1 if x == "Petrol" else 0)
+
+cars["is_private"] = cars.list_type.apply(lambda x: 1 if x == "private" else 0)
+
+#----
+color_list = cars.colour.unique()
+
+for color in color_list:
+
+    cars["is_"+color] = cars.colour.apply(lambda x: 1 if x == color else 0)
+
+#---
+
 # DataFrame look at types
 
 print(df.dtypes)
