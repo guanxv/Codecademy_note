@@ -1,3 +1,12 @@
+# workflow to push existing project to github
+
+1. set up the empty repository at github
+2. git init
+3. git add .
+4. git commit -m "first commit"
+5. git remote add origin remote repository URL
+6. git remote -v
+7. git push origin master
 
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -34,7 +43,8 @@ git log shows a list of all previous commits
 #----------------------
 
 git remote add origin https://github.com/guanxv/projectname.git
-git push -u origin master
+git remote -v # verify the remote
+git push -u origin master 
 git pull # bring the change from original
 
 git show HEAD # show the latested changes
