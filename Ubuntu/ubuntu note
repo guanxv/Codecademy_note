@@ -1,0 +1,24 @@
+Install downloaded deb
+
+open terminal in downloaded folder
+
+	sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+
+install multipule program
+
+	sudo apt install vlc gimp
+
+install preload ( a program learn your behavior and load app into ram before you open them)
+
+	sudo apt install preload
+
+install bleachbit
+	
+	sudo apt install bleachbit
+
+install bundle
+
+	sudo sh VMware-Player-16.1.0-17198959.x86_64.bundle
+
+
