@@ -21,6 +21,15 @@
 #ctrl + [
 #ctrl + ]
 
+#run code
+#ctrl + alt + n
+
+#toggle comment block
+# ctrl + /
+
+
+
+
 
 
 

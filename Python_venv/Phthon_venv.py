@@ -67,3 +67,12 @@ pip freeze --local
 # to activate an virtual enviroment  in Git Bash, you can use
 
 source /venv/Scripts/activate
+
+#
+cd venv
+cd Scripts
+source activate
+
+#
+ 
+source ./venv/Scripts/activate
