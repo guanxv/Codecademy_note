@@ -1,0 +1,97 @@
+Install downloaded deb
+
+open terminal in downloaded folder
+
+	sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+
+install multipule program
+
+	sudo apt install vlc gimp
+
+install preload ( a program learn your behavior and load app into ram before you open them)
+
+	sudo apt install preload
+
+install bleachbit
+	
+	sudo apt install bleachbit
+
+install bundle
+
+	sudo sh VMware-Player-16.1.0-17198959.x86_64.bundle
+
+uninstall software
+
+    sudo apt-get remove XXXXXX
+
+
+
+
+#check which process is use the folder /  file
+
+sudo fuser -vm /mnt/dir
+
+Then use system monitor to kill the process ( right click from task bar)
+
+#
+
+
+# sytax for install multipul apps.
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+
+### terminal tools 
+
+ranger
+
+terminal file manager
+
+cmatrix 
+
+Matrix style background
+
+
+#############33# back linux command ###########
+
+ll
+
+list file
+
+ls
+
+list file
+
+
+
+
+
+
+############# linux basic folder structure ##################3
+
+/bin  # stand for binarys , stores for basic funcions like ls , rm , pwd, 
+
+/sbin # system binary, standard user dont have access.
+
+/boot # every thing need for boot placed here, 
+
+/cdroom #legacy folder
+
+/dev # allthe device listed here as file, like you hard disk, sda, and first partition is sda1
+
+/ect # system wide setting. like /etc/apt/sources
+
+/lib # librarys for sys required by binary /bin
+
+/mnt & /media mounted storage 
+
+/opt optional , for optional sofware to be instlled her. 
+
+
+
