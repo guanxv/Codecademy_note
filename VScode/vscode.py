@@ -27,6 +27,14 @@
 #toggle comment block
 # ctrl + /
 
+#output 中文乱码 （在代码中加入）
+#--------------解决 VScode output 里中文乱码的问题---------------------
+import io
+import sys
+#改变标准输出的默认编码
+sys.stdout=io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
+#--------------解决 VScode output 里中文乱码的问题---------------------
+
 
 
 
