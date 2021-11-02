@@ -69,25 +69,41 @@ opkg install xxx
 opkg update && opkg install XXX
 
 
-block info （显示固件信息）
+    uci show network
+    uci set fstab.mount xxx = ""
+    uci commit fstab
+    uci -q delete fstab.overlay
 
-/dev/loop0: UUID="5de7e234-6913-43b6-8e3a-d26f587f76d5" LABEL="rootfs_data" VERSION="1.14" MOUNT="/overlay" TYPE="f2fs"
-/dev/sda1: UUID="84173db5-fa99-e35a-95c6-28613cc79ea9" LABEL="kernel" VERSION="1.0" MOUNT="/boot" TYPE="ext4"
-/dev/sda2: UUID="488a811c-6314f3f2-5e697022-95d0cdbb" VERSION="4.0" MOUNT="/rom" TYPE="squashfs"
-/dev/sda3: UUID="3cf63333-2e59-432b-8839-ac7cf5b825d1" VERSION="1.0" TYPE="ext4"
+    reboot
 
 
-df -h
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-mount overlay #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#硬盘增加分区，+ 挂载overlay流程
 
-Filesystem                Size      Used Available Use% Mounted on
-/dev/root                 4.0M      4.0M         0 100% /rom
-tmpfs                     2.9G    232.0K      2.9G   0% /tmp
-/dev/loop0               98.1M     96.7M      1.3M  99% /overlay
-overlayfs:/overlay       98.1M     96.7M      1.3M  99% /
-/dev/sda1                15.7M      4.8M     10.7M  31% /boot
-/dev/sda1                15.7M      4.8M     10.7M  31% /boot
-tmpfs                   512.0K         0    512.0K   0% /dev
+opkg update && opkg install cfdisk
 
+cfdisk
+
+#Free Space  / New / primary / write / yes
+
+block info
+
+
+# /dev/loop0: UUID="5de7e234-6913-43b6-8e3a-d26f587f76d5" LABEL="rootfs_data" VERSION="1.14" MOUNT="/overlay" TYPE="f2fs"
+# /dev/sda1: UUID="84173db5-fa99-e35a-95c6-28613cc79ea9" LABEL="kernel" VERSION="1.0" MOUNT="/boot" TYPE="ext4"
+# /dev/sda2: UUID="488a811c-6314f3f2-5e697022-95d0cdbb" VERSION="4.0" MOUNT="/rom" TYPE="squashfs"
+# /dev/sda3: UUID="3cf63333-2e59-432b-8839-ac7cf5b825d1" VERSION="1.0" TYPE="ext4"
+
+
+mkfs.ext4 /dev/sda3
+
+mkdir /mnt/sda3
+
+mount /dev/sda3 /mnt/sda3
+
+cp -r /overlay/* /mnt/sda3
+
+mount /dev/sda3 /overlay
 
 
 vim /etc/rc.local （开机的自动批处理）
@@ -105,34 +121,25 @@ vim /etc/rc.local （开机的自动批处理）
     exit 0
 
 
-    uci show network
-    uci set fstab.mount xxx = ""
-    uci commit fstab
-    uci -q delete fstab.overlay
+cat /etc/rc.local
 
-    reboot
+reboot
+
+df -h
+
+# Filesystem                Size      Used Available Use% Mounted on
+# /dev/root                 4.0M      4.0M         0 100% /rom
+# tmpfs                     2.9G    232.0K      2.9G   0% /tmp
+# /dev/loop0               98.1M     96.7M      1.3M  99% /overlay
+# overlayfs:/overlay       98.1M     96.7M      1.3M  99% /
+# /dev/sda1                15.7M      4.8M     10.7M  31% /boot
+# /dev/sda1                15.7M      4.8M     10.7M  31% /boot
+# tmpfs                   512.0K         0    512.0K   0% /dev
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#- end of mount overlay #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 
 
-
-#硬盘增加分区，+ 挂载overlay流程
-
-opkg update && opkg install cfdisk
-
-cfdisk
-
-#Free Space  / New / primary / write / yes
-
-block info
-
-mkfs.ext4 /dev/sda3
-
-mount /dev/sda3 /mnt/sda3
-
-cp -r /overlay/* /mnt/sda3
-
-mount /dev/sda3 /overlay
-
-#AdGuardHome install
+#-#-#-#-#-#-#-#-#-AdGuardHome install#-#-#-#-#-#-#-#-
 ssh root@192.168.1.1
 opkg update && opkg install wget
 mkdir /opt/ && cd /opt
@@ -146,7 +153,23 @@ rm AdGuardHome_linux_armv5.tar.gz
 #or install it directly with:
 /opt/AdGuardHome/AdGuardHome -s install
 
+#DNS forwarding, after install the AdGuardHome , need to set up the DNS forwarding
+# 在网络，==》 DHCP/DNS ==》基本设置 ==》 DNS转发 下输入 192.168.0.1#535
 
+#在防火墙 自定义规则 加入 ，防止规则漏网
+iptables -t nat -A PREROUTING -i br-lan -p udp --dport 53 -j DNAT --to 192.168.1.1:5353
+iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 53 -j DNAT --to 192.168.1.1:5353
+
+#编辑脚本，让AdGuardHome 每次重启都自动启动
+vim /etc/rc.local
+
+#i for start writing
+/opt/AdGuardHome/AdGuardHome
+#Esc
+#:w (save)
+#:q (quit)
+
+#-#-#-#-#-#-#-#-#-AdGuardHome install end #-#-#-#-#-#-#-#-
 
 #USB tethering
 
@@ -166,3 +189,70 @@ usbmuxd -v
 sed -i -e "\$i usbmuxd" /etc/rc.local
 
 #安装好后，别忘了再路由器里增加interface
+
+
+
+
+#装了eSir 的固件，然后自己配置了Adhomeguard，运行出现了问题。于是决定自己用rom builder 写一个镜像刷机。
+
+#image builder 挺好用的，照着官方教程一步步做就行。
+
+
+#-#-#-#-#-#-#-#-#-#- #manually add interface #-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#这个代码可以手动开启usb 上网的interface
+
+uci set network.wan=interface
+uci set network.wan.ifname='USB_Te'
+uci set network.wan.proto='dhcp'
+uci set network.wan.device='usb0'
+uci commit network
+/etc/init.d/network restart
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+
+
+#image builder code
+
+# 官方教程挺好用，跟着照做就行
+# 1. 在ubuntu装包
+
+sudo apt-get update
+
+sudo apt install build-essential libncurses5-dev libncursesw5-dev \
+zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip python
+
+# 2.去页面下载包 X86 应该是这个包 https://downloads.openwrt.org/snapshots/targets/x86/64/openwrt-imagebuilder-x86-64.Linux-x86_64.tar.xz
+# 这个包刷上的系统应该是最纯净的系统。啥也没有，纯净到连网页设置界面的LUCI都没有
+# 所以要提前准备package 列表
+
+# 先解包
+
+tar -J -x -f openwrt-imagebuilder-*.tar.xz
+cd openwrt-imagebuilder-*/
+
+# 3.设置变量
+
+make info #检查可用的profile
+
+PROFILE="generic" #x86应该是这个
+
+PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci"
+#以上是usb 共享上网，加luci 所需要的包，但是还是远远不够。
+
+echo $(opkg list-installed | sed -e "s/\s.*$//") #应该提前在默认可以运行的固件里跑这个命令。获取包的列表。
+
+# 4.开搞
+make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
+
+# 5.清理
+make clean
+
+# 6.The built image will be found under the subdirectory ./bin/targets/<target>/generic or look inside ./build_dir/ for a files *-squashfs-sysupgrade.bin and *-squashfs-factory.bin (e.g. /build_dir/target-mips_24kc_musl/linux-ar71xx_tiny/tmp/openwrt-18.06.2-ar71xx-tiny-tl-wr740n-v6-squashfs-factory.bin)
+
+
+
+
+#-#-#-#-#-#-#-#-#-#-#-#-#- install Luci #-#-#-#-#-#-#-#-#-
+opkg update && opkg install luci
+#-#-#-#-#-#-#-#-#-#-#-#-#-end of install Luci #-#-#-#-#-#-#-#-#-
+
