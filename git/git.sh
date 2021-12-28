@@ -210,3 +210,38 @@ git config --global core.excludesfile ~/.gitignore_global
 
 # In general, files/ignore rules that have to be universally ignored should go in .gitignore, 
 # and otherwise files that you want to ignore only on your local clone should go into .git/info/exclude
+
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#  git clone vs git copy
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+
+# What is the difference between doing (after mkdir repo and cd repo):
+
+git init
+git remote add origin git://github.com/cmcculloh/repo.git
+git fetch --all
+git pull origin master
+
+# and
+
+git clone git://github.com/cmcculloh/repo.git
+
+# # They're basically the same, except clone will setup additional remote tracking branches, not just master.
+
+# # git clone is how you get a local copy of an existing repository to work on. It's usually only used 
+# once for a given repository, unless you want to have multiple working copies of it around. 
+# (Or want to get a clean copy after messing up your local one...)
+
+# # git pull (or git fetch + git merge) is how you update that local copy with new commits from the
+#  remote repository. If you are collaborating with others, it is a command that you will run
+#   frequently.
+
+# # As your first example shows, it is possible to emulate git clone with an assortment of other git 
+# commands, but it's not really the case that git pull is doing "basically the same thing" as git
+#  clone (or vice-versa).
+
+# In laymen language we can say:
+
+# Clone: Get a working copy of the remote repository.
+# Pull: I am working on this, please get me the new changes that may be updated by others.

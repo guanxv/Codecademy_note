@@ -1,3 +1,10 @@
+#-#-#-#-#- update system #-#-#-#-
+
+sudo apt update
+sudo apt upgrade
+
+
+
 Install downloaded deb
 
 open terminal in downloaded folder
