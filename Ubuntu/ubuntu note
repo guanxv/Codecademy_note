@@ -1,3 +1,8 @@
+#file explorer
+
+short cut ket Ctrl + L show the current address
+
+
 #-#-#-#-#- update system #-#-#-#-
 
 sudo apt update
