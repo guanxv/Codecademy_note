@@ -51,6 +51,8 @@ hashcat -a 3 -m 0 example0.hash ?a?a?a?a?a?a #will try all the 6 keyspaces (uper
 
 # by the way to extrac a firmware and modify and packing back to a bin file see this link https://www.youtube.com/watch?v=hV8W4o-Mu2o&t=314s
 
+#sample command using mask to crack shadow
+hashcat -a3 -m500 -o result.txt shadow ./Corporate_Masks-master/corp_8.hcmask
 
 
-
+# speed, with GTX 1660 , can crack 8 dig, digtial in 20 sec.
