@@ -256,3 +256,13 @@ make clean
 opkg update && opkg install luci
 #-#-#-#-#-#-#-#-#-#-#-#-#-end of install Luci #-#-#-#-#-#-#-#-#-
 
+
+#在家里装完软路由以后发现没法remote desktop 到公司的主机。（主机就在家里）
+#折腾了半天， 一开始以为是OpenWRT的设置问题。后来又用了不同的路由测试都不行。
+#最后发现是公司电脑的防火墙设置改变了， 在控制面版--防火墙---允许的应用--找到remote desktop --- 选择public/private
+#另外我还在allow remote desktop 的设置里，允许访问的人里加入了Everyone。（不知道这个设置是否有用）
+
+#2021.12.16 update
+#今天无法访问网络，检查了一下， 发现openwrt的 /overlay 空间为0， AdGuard Home 停止工作。
+#比较笨的解决办法是，今入openwrt， 系统 ==》备份/升级 ==》 恢复出厂设置。
+#恢复后 ，修改openwrt的IP地址，然后重新配置USB Wan共享。这次并没有再开启AdGuardHome
