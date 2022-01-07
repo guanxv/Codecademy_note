@@ -236,13 +236,27 @@ make info #检查可用的profile
 
 PROFILE="generic" #x86应该是这个
 
-PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci"
+PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils"
 #以上是usb 共享上网，加luci 所需要的包，但是还是远远不够。
 
 echo $(opkg list-installed | sed -e "s/\s.*$//") #应该提前在默认可以运行的固件里跑这个命令。获取包的列表。
 
+# 3.5 copy existing config from current router
+
+mkdir -p files/etc/config
+scp root@192.168.0.1:/etc/config/network files/etc/config/
+scp root@192.168.0.1:/etc/config/wireless files/etc/config/
+scp root@192.168.0.1:/etc/config/firewall files/etc/config/
+
+#romote access to router
+
+ssh root@192.168.0.1
+
 # 4.开搞
-make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
+for X86 profile is not required.
+#make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
+
+make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=1024
 
 # 5.清理
 make clean
