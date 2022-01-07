@@ -208,6 +208,8 @@ uci set network.wan.device='usb0'
 uci commit network
 /etc/init.d/network restart
 
+uci show network
+
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 
 
@@ -256,12 +258,55 @@ ssh root@192.168.0.1
 for X86 profile is not required.
 #make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
 
-make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=1024
+make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=1024 #looks like the 1024 is for 0.1M ???
 
 # 5.清理
 make clean
 
 # 6.The built image will be found under the subdirectory ./bin/targets/<target>/generic or look inside ./build_dir/ for a files *-squashfs-sysupgrade.bin and *-squashfs-factory.bin (e.g. /build_dir/target-mips_24kc_musl/linux-ar71xx_tiny/tmp/openwrt-18.06.2-ar71xx-tiny-tl-wr740n-v6-squashfs-factory.bin)
+
+
+# 7.copy the file to an linux system, and write it into vm.
+#unzip the file 
+
+gzip -d openwrt-21.02.1-x86-64-generic-ext4-combined.img.gz
+
+#decompress the file .gz to .img
+
+# 8.write it into a prepared hard disk file
+
+lsblk #check the hard disk address
+
+'''
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+loop0    7:0    0     4K  1 loop /snap/bare/5
+loop1    7:1    0 670.8M  1 loop /snap/pycharm-professional/269
+loop2    7:2    0 144.6M  1 loop /snap/chromium/1810
+loop3    7:3    0  55.5M  1 loop /snap/core18/2253
+loop4    7:4    0 217.4M  1 loop /snap/code/81
+sda      8:0    0     8G  0 disk 
+sdb      8:16   0    30G  0 disk 
+└─sdb1   8:17   0    30G  0 part /
+sr0     11:0    1  1024M  0 rom  '''
+
+dd if=openwrt-21.02.1-x86-64-generic-ext4-combined.img of=/dev/sda
+
+# 9. close ubuntu, unmont the hard disk file, and mount it back to openwrt vm
+# !!! this imange now can run on the vm
+
+#10. check installed packages 
+
+opkg list-installed 
+opkg list-installed | grep "usb"
+opkg list-installed | grep "kmod"
+
+#11. check disk space. 
+df -h
+
+/dev/root 102.4M
+/dev/sda1/15.7M
+
+
 
 
 
