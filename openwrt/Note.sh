@@ -140,11 +140,12 @@ df -h
 
 
 #-#-#-#-#-#-#-#-#-AdGuardHome install#-#-#-#-#-#-#-#-
+
 ssh root@192.168.1.1
 opkg update && opkg install wget
 mkdir /opt/ && cd /opt
 #下载前检查版本
-wget -c https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.101.0/AdGuardHome_linux_armv5.tar.gz
+wget -c https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.2/AdGuardHome_linux_amd64.tar.gz
 tar xfvz AdGuardHome_linux_armv5.tar.gz
 rm AdGuardHome_linux_armv5.tar.gz
 #Either just run it:
@@ -169,9 +170,20 @@ vim /etc/rc.local
 #:w (save)
 #:q (quit)
 
+
+#ref:   https://forum.openwrt.org/t/openwrt-adguard-home-101-dnsmasq/110864
+#       https://github.com/AdguardTeam/AdGuardHome
+#       https://www.youtube.com/watch?v=yMcM40ipDlQ
+#       https://forum.openwrt.org/t/openwrt-adguard-home-101-unbound/112007
+#       https://forum.openwrt.org/t/howto-running-adguard-home-on-openwrt/51678?page=13
+
+
+
+
+
 #-#-#-#-#-#-#-#-#-AdGuardHome install end #-#-#-#-#-#-#-#-
 
-#USB tethering
+#--------------------USB tethering----------------
 
 opkg update
 opkg install kmod-usb-net-rndis
@@ -190,13 +202,7 @@ sed -i -e "\$i usbmuxd" /etc/rc.local
 
 #安装好后，别忘了再路由器里增加interface
 
-
-
-
-#装了eSir 的固件，然后自己配置了Adhomeguard，运行出现了问题。于是决定自己用rom builder 写一个镜像刷机。
-
-#image builder 挺好用的，照着官方教程一步步做就行。
-
+#--------------------USB tethering end----------------
 
 #-#-#-#-#-#-#-#-#-#- #manually add interface #-#-#-#-#-#-#-#-#-#-#-#-#-#-
 #这个代码可以手动开启usb 上网的interface
@@ -210,8 +216,13 @@ uci commit network
 
 uci show network
 
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-# end of manually add interface-#-#-#-#-#-#-#-#-
 
+
+
+#装了eSir 的固件，然后自己配置了Adhomeguard，运行出现了问题。于是决定自己用rom builder 写一个镜像刷机。
+
+#image builder 挺好用的，照着官方教程一步步做就行。
 
 #image builder code
 
@@ -239,7 +250,7 @@ make info #检查可用的profile
 PROFILE="generic" #x86应该是这个 # update, 2022.01.08 profile should be empty for x86
 
 PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils"
-#以上是usb 共享上网，加luci 所需要的包，但是还是远远不够。
+#以上是usb 共享上网，加luci
 
 echo $(opkg list-installed | sed -e "s/\s.*$//") #应该提前在默认可以运行的固件里跑这个命令。获取包的列表。
 
@@ -259,6 +270,9 @@ for X86 profile is not required.
 #make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
 
 make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=38912 # THIS PARTSIZE PARAMETER did not work in command line, need to change the .config setting.
+#-----------------------------------------------------------------------------------------------
+### THIS PARTSIZE PARAMETER did not work in command line, need to change the .config setting.
+#-----------------------------------------------------------------------------------------------
 
 # 5.清理
 make clean
@@ -335,3 +349,11 @@ opkg update && opkg install luci
 #今天无法访问网络，检查了一下， 发现openwrt的 /overlay 空间为0， AdGuard Home 停止工作。
 #比较笨的解决办法是，今入openwrt， 系统 ==》备份/升级 ==》 恢复出厂设置。
 #恢复后 ，修改openwrt的IP地址，然后重新配置USB Wan共享。这次并没有再开启AdGuardHome
+
+#2022.01.08 update
+#Spend whole day to workout the way to build a custom image with bigger storage. was trying to use the 
+#make menuconfig but it took so long and didn't work.
+#swithed to image builder methoed, with tweaking of the .config file.  also tested the file with VM.
+
+#now i have 4G ext root file system. will working on to install the ADguard home manually. 
+
