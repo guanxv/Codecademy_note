@@ -258,7 +258,7 @@ ssh root@192.168.0.1
 for X86 profile is not required.
 #make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
 
-make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=38912 #looks like the 1024 is for 0.1M ???
+make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=38912 # THIS PARTSIZE PARAMETER did not work in command line, need to change the .config setting.
 
 # 5.清理
 make clean

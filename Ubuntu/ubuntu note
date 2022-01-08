@@ -107,3 +107,41 @@ list file
 
 
 
+# ubuntu free up space
+
+sudo apt-get autoremove #remove not used package
+
+
+sudo apt-get remove package-name1 package-name2 # uninstall not used package
+
+
+sudo du -sh /var/cache/apt  #clean up APT catch
+sudo apt-get clean
+sudo apt-get autoclean
+
+journalctl --disk-usage #check systemd journal logs
+sudo journalctl --vacuum-time=3d # clear logs order than 3 days
+
+du -h /var/lib/snapd/snaps   #check older versions of Snap applications
+
+#save this script as .sh file, set permission and run.
+
+#!/bin/bash
+# Removes old revisions of snaps
+# CLOSE ALL SNAPS BEFORE RUNNING THIS
+set -eu
+snap list --all | awk '/disabled/{print $1, $3}' |
+    while read snapname revision; do
+        snap remove "$snapname" --revision="$revision"
+    done
+
+sudo ./clean_old_snap_app.sh
+
+du -sh ~/.cache/thumbnails # check thumb nails
+
+rm -rf ~/.cache/thumbnails/* # remove thumb nails
+
+
+
+
+
