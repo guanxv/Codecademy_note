@@ -236,7 +236,7 @@ cd openwrt-imagebuilder-*/
 
 make info #检查可用的profile
 
-PROFILE="generic" #x86应该是这个
+PROFILE="generic" #x86应该是这个 # update, 2022.01.08 profile should be empty for x86
 
 PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils"
 #以上是usb 共享上网，加luci 所需要的包，但是还是远远不够。
@@ -258,7 +258,7 @@ ssh root@192.168.0.1
 for X86 profile is not required.
 #make image PROFILE="profile-name" PACKAGES="pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6" FILES="files"
 
-make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=1024 #looks like the 1024 is for 0.1M ???
+make image PACKAGES="kmod-usb-net-rndis kmod-nls-base kmod-usb-core kmod-usb-net kmod-usb-net-cdc-ether kmod-usb2 kmod-usb-net-ipheth usbmuxd libimobiledevice usbutils luci kmod-fs-ext4" FILES="files" CONFIG_TARGET_ROOTFS_PARTSIZE=38912 #looks like the 1024 is for 0.1M ???
 
 # 5.清理
 make clean
