@@ -307,6 +307,16 @@ df -h
 /dev/sda1/15.7M
 
 
+#12. prepare Finnix Disk 
+#download the iso image , write it into a usb drive 
+
+sudo dd if=~/Downloads/finnix-123.iso of=/dev/sdb conv=fdatasync status=progress 
+
+#The dd does not bypass the kernel disk caches when it writes to a device, so some part of data may be not written yet to the USB stick upon dd completion. If you unplug your USB stick at that moment, the content on the USB stick would be inconsistent. Thus, your system could even fail to boot from this USB stick.
+#The conv=fdatasync makes dd effectively call fdatasync() system call at the end of transfer just before dd exits.
+
+
+
 
 
 
