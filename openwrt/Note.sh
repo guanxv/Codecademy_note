@@ -157,9 +157,16 @@ rm AdGuardHome_linux_armv5.tar.gz
 #DNS forwarding, after install the AdGuardHome , need to set up the DNS forwarding
 # 在网络，==》 DHCP/DNS ==》基本设置 ==》 DNS转发 下输入 192.168.0.1#535
 
-#在防火墙 自定义规则 加入 ，防止规则漏网
+#在防火墙 自定义规则 加入 ，防止规则漏网  Network ==>Firewall ==> Custom Rules
 iptables -t nat -A PREROUTING -i br-lan -p udp --dport 53 -j DNAT --to 192.168.1.1:5353
 iptables -t nat -A PREROUTING -i br-lan -p tcp --dport 53 -j DNAT --to 192.168.1.1:5353
+
+#this command for deleting wrong rules
+iptables -t nat -D PREROUTING -i br-lan -p udp --dport 53 -j DNAT --to 192.168.0.1:53
+#2022.01.09 Update, when i'm setting up the router, i type the wrong iptables command. all the traffic 
+#is forwarding to 192.168.1.1. which is not exist, this causing the client in the network not having internet.
+#had to use the -D command to delete the wrong rules. 
+
 
 #编辑脚本，让AdGuardHome 每次重启都自动启动
 vim /etc/rc.local
