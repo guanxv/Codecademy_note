@@ -19,18 +19,18 @@ john --fork=4 shadow # to crack the password.
 
 but most of the times, the password is complex, you need to use the hackcat to crack the password.
 
-hackcat is able to use GPU, so the speed is very fast.
+hashcat is able to use GPU, so the speed is very fast.
 
 
 sample command:
 
-hackcat -a3 -m500 "$1$60a6wQfe$XQEdtkH8HMvQis1IZIwT50" 
+hashcat -a3 -m500 "$1$60a6wQfe$XQEdtkH8HMvQis1IZIwT50" 
 
     #$1$ indicate it is MD5. 
     #60a6wQfe$ is the salt, 
     #XQEdtkH8HMvQis1IZIwT50 is the actaul hash of the password.
 
-hackcat is able to crack many types of password. see help for more inforamtion 
+hashcat is able to crack many types of password. see help for more inforamtion 
 
 sample of using mask attack
 
@@ -78,6 +78,11 @@ hashcat -a0 -m500 -o result.txt shadow rockyou.txt -r ./rules/best64.rule --loop
 
 hashcat -a0 -m500 -o result.txt shadow realuniq.lst -r ./rules/best64.rule --loopback
 
+
+Sample hashcat command
+
+hashcat -a3 -m0 8743b52063cd84097a65d1633f5c74f5
+hashcat -a3 -m0 "8743b52063cd84097a65d1633f5c74f5"
 
 
 # speed, with GTX 1660 , can crack 8 dig, digtial in 20 sec.
