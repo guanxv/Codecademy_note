@@ -9,6 +9,7 @@ class FirmwarePart:
         self.size = size
 
 firmware_parts = [
+    FirmwarePart("file_header", 0x00, 0x200),
     FirmwarePart("uimage_header", 0x200, 0x40),
     FirmwarePart("uimage_kernel", 0x240, 0x11e120 - 0x240),
     FirmwarePart("squashfs_1", 0x11e120, 0x309120 - 0x11e120),
@@ -24,9 +25,11 @@ if sys.argv[1] == "unpack":
         outfile.write(data)
         outfile.close()
         print(f"Wrote {part.name} - {hex(len(data))} bytes")
+
+        
 elif sys.argv[1] == "pack":
     f = open(sys.argv[2], "wb")
-    for part in firmware_parts[1:]:
+    for part in firmware_parts:
         i = open(part.name, "rb")
         data = i.read()
         f.write(data)
