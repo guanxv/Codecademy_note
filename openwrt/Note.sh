@@ -357,7 +357,7 @@ opkg update && opkg install luci
 #比较笨的解决办法是，今入openwrt， 系统 ==》备份/升级 ==》 恢复出厂设置。
 #恢复后 ，修改openwrt的IP地址，然后重新配置USB Wan共享。这次并没有再开启AdGuardHome
 
-<<<<<<< HEAD
+
 #openwrt 跑分
 
 root@OpenWrt:~# opkg install openssl-util
@@ -403,4 +403,3 @@ chacha20-poly1305   136009.27k   249059.76k   464933.59k   523060.91k   541971.8
 
 #now i have 4G ext root file system. will working on to install the ADguard home manually. 
 
->>>>>>> 389482088f641aca7bd5c56c23a657400fb0d174
