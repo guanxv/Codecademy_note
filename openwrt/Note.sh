@@ -335,3 +335,41 @@ opkg update && opkg install luci
 #今天无法访问网络，检查了一下， 发现openwrt的 /overlay 空间为0， AdGuard Home 停止工作。
 #比较笨的解决办法是，今入openwrt， 系统 ==》备份/升级 ==》 恢复出厂设置。
 #恢复后 ，修改openwrt的IP地址，然后重新配置USB Wan共享。这次并没有再开启AdGuardHome
+
+#openwrt 跑分
+
+root@OpenWrt:~# opkg install openssl-util
+
+root@OpenWrt:~# openssl speed -evp aes-256-gcm
+Doing aes-256-gcm for 3s on 16 size blocks: 17687214 aes-256-gcm's in 3.00s
+Doing aes-256-gcm for 3s on 64 size blocks: 5578494 aes-256-gcm's in 3.00s
+Doing aes-256-gcm for 3s on 256 size blocks: 1457280 aes-256-gcm's in 3.00s
+Doing aes-256-gcm for 3s on 1024 size blocks: 370279 aes-256-gcm's in 3.00s
+Doing aes-256-gcm for 3s on 8192 size blocks: 46115 aes-256-gcm's in 3.00s
+Doing aes-256-gcm for 3s on 16384 size blocks: 23033 aes-256-gcm's in 3.00s
+OpenSSL 1.1.1l  24 Aug 2021
+built on: Fri Dec 31 16:55:29 2021 UTC
+options:bn(64,64) rc4(16x,int) des(int) aes(partial) blowfish(ptr)
+compiler: x86_64-openwrt-linux-musl-gcc -fPIC -pthread -m64 -Wa,--noexecstack -Wall -O3 -pipe -fno-caller-saves -fno-plt -fhonour-copts -Wno-error=unused-but-set-variable -Wno-error=unused-result -Wformat -Werror=format-security -fstack-protector -D_FORTIFY_SOURCE=1 -Wl,-z,now -Wl,-z,relro -O3 -DPIC -fpic -ffunction-sections -fdata-sections -znow -zrelro -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_CPUID_OBJ -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DKECCAK1600_ASM -DRC4_ASM -DMD5_ASM -DAESNI_ASM -DVPAES_ASM -DGHASH_ASM -DECP_NISTZ256_ASM -DX25519_ASM -DPOLY1305_ASM -DNDEBUG
+The 'numbers' are in 1000s of bytes per second processed.
+type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 bytes  16384 bytes
+aes-256-gcm      94331.81k   119007.87k   124354.56k   126388.57k   125924.69k   125790.89k
+
+#94331.81 （这个是岩峰笔记本的跑分）
+
+root@OpenWrt:~# openssl speed -evp chacha20-poly1305
+Doing chacha20-poly1305 for 3s on 16 size blocks: 25076709 chacha20-poly1305's in 2.95s
+Doing chacha20-poly1305 for 3s on 64 size blocks: 11596845 chacha20-poly1305's in 2.98s
+Doing chacha20-poly1305 for 3s on 256 size blocks: 5430279 chacha20-poly1305's in 2.99s
+Doing chacha20-poly1305 for 3s on 1024 size blocks: 1532405 chacha20-poly1305's in 3.00s
+Doing chacha20-poly1305 for 3s on 8192 size blocks: 198476 chacha20-poly1305's in 3.00s
+Doing chacha20-poly1305 for 3s on 16384 size blocks: 99689 chacha20-poly1305's in 3.00s
+OpenSSL 1.1.1l  24 Aug 2021
+built on: Fri Dec 31 16:55:29 2021 UTC
+options:bn(64,64) rc4(16x,int) des(int) aes(partial) blowfish(ptr)
+compiler: x86_64-openwrt-linux-musl-gcc -fPIC -pthread -m64 -Wa,--noexecstack -Wall -O3 -pipe -fno-caller-saves -fno-plt -fhonour-copts -Wno-error=unused-but-set-variable -Wno-error=unused-result -Wformat -Werror=format-security -fstack-protector -D_FORTIFY_SOURCE=1 -Wl,-z,now -Wl,-z,relro -O3 -DPIC -fpic -ffunction-sections -fdata-sections -znow -zrelro -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_CPUID_OBJ -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DKECCAK1600_ASM -DRC4_ASM -DMD5_ASM -DAESNI_ASM -DVPAES_ASM -DGHASH_ASM -DECP_NISTZ256_ASM -DX25519_ASM -DPOLY1305_ASM -DNDEBUG
+The 'numbers' are in 1000s of bytes per second processed.
+type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 bytes  16384 bytes
+chacha20-poly1305   136009.27k   249059.76k   464933.59k   523060.91k   541971.80k   544434.86k
+
+#136009 （这个是岩峰笔记本的跑分）
