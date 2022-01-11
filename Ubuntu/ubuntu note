@@ -145,3 +145,24 @@ rm -rf ~/.cache/thumbnails/* # remove thumb nails
 
 
 
+安装Fcitx
+
+sudo apt-get install im-switch fcitx 
+sudo im-switch -s fcitx -z default
+im-switch -s fcitx -z default#修改当前用户的默认输入法, 具体看man im-switch
+
+完成设置最好重启一下X，输入法就生效了.
+如果发现软件界面字体是方块, gedit ~/.fcitx/config 或gksu gedit /usr/share/fcitx/data/tables.conf 打开配置文件修改一下字体就OK.
+字体列表: xlsfonts或 fc-list (取=前面)
+
+
+某些情况下可能，在安装了fcitx输入法以后可能会出现和SCIM并存的问题，只要用im-switch把默认输入法改成fcitx就可以了：
+
+ sudo im-switch -a fcitx
+ im-switch -a fcitx
+
+
+
+sudo sh *.bin
+
+
