@@ -180,3 +180,28 @@ im-switch -s fcitx -z default#修改当前用户的默认输入法, 具体看man
 sudo sh *.bin
 
 
+#boot MBR BCD easy BCD repair.
+#20220416 今天打算用以下ubuntu，忽然发现进不去了，grub4dos 报错。 processing the preset-menu
+#然后就开在这一屏幕
+
+#用EasyBCD修理了一下，可以进Ubuntu， 但是发现win无法关机。强行关机后再开无法进入win
+#具体错误是，选win启动项里的windows后出现，/NST/AutoNeoGrub0.mbr
+
+#试了用winPE的引导修复工具，还是不能启动。
+
+#最后的解决方法是，去微软网站下载windows光盘镜像 地址：https://www.microsoft.com/en-gb/software-download/windows10
+#把镜像文件刻进UBS。 见ubuntu下dd命令（记得umount）
+#u盘启动，进入commandline。
+bootrec /fixmbr
+bootrec /fixroot
+bootrec /scanos
+bootrec /rebuildbcd
+
+#其中 /fixroot命令显示无法找到元素
+#最后用
+e:
+cd efi\microsoft\boot\
+bcdboot c:\windows /l en-us /s e: #重建了bcd
+#/s 目标盘符
+#/l 语言
+#终于解决
