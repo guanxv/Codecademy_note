@@ -204,4 +204,17 @@ cd efi\microsoft\boot\
 bcdboot c:\windows /l en-us /s e: #重建了bcd
 #/s 目标盘符
 #/l 语言
-#终于解决
+#在UEFI里改变启动顺序，把硬盘的uefi往前提，终于解决windows 启动的问题。
+
+#恢复Ubuntu双启动。
+#要想再次进入ubuntu， 进入UEFI设置
+    # 把非UEFI的硬盘启动往前提
+    # 确认打开legacy + UEFI
+    # 打开 不安全的启动
+
+# 重新启动电脑，又可以进入带有windows错误的BCD启动界面，这个界面可以启动Ubuntu
+# 进入windows， 打开EasyBCD，手动加载BCD文件 （c:\boot\BCD)，删除无法进入的win启动项，重新添加windows
+# 可以看到启动路径指到了c:\windows\system32\winload.exe.
+# 再次启动电脑，win / ubuntu 双启动正常工作。（legacy mode）
+
+
