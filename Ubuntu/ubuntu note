@@ -144,6 +144,20 @@ rm -rf ~/.cache/thumbnails/* # remove thumb nails
 
 
 
+#fix .sh not running 
+#with error message Bash script and /bin/bash^M: bad interpreter: No such file or directory
+
+sed -i -e 's/\r$//' scriptname.sh
+./scriptname.sh
+
+
+#fix .sh not running
+#use 
+which bash 
+#to find the loaction of bash
+# change file to the right location . e.g. #!/usr/bin/bash
+
+
 
 安装Fcitx
 
