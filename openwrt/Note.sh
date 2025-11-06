@@ -116,7 +116,7 @@ vim /etc/rc.local （开机的自动批处理）
 
     mount /dev/sda3 /overlay
     usbmuxd
-    /opt/AdGuardHome/AdGuardHome #如果限制性这个，后面的语句就无法执行了
+    /opt/AdGuardHome/AdGuardHome #如果先执行这个，后面的语句就无法执行了
 
     exit 0
 

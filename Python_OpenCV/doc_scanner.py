@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from stackimg import stackImages
 
-frameWidth = 1280
-frameHeight = 720
+frameWidth = 640
+frameHeight = 480
 cap = cv2.VideoCapture(0)
 cap.set(3, frameWidth)
 cap.set(4, frameHeight)

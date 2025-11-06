@@ -8,3 +8,5 @@ Jellyfin 在win10安装后（以service）需要在windows防火墙允许程序�
 Plex已经可以以第三方程序的形式安装在群晖DSM， Jellyfin只能以docker的形式安装。docker安装可能无法使用硬件解码。
 
 DSM 的video station 目前无法解码MKV
+
+192.168.0.111:8080
